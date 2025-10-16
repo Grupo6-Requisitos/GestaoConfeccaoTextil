@@ -13,6 +13,6 @@ import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
 @SelectClasspathResource("dev/com/confectextil/dominio/principal/teste")
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "dev.com.confectextil.dominio.principal")
-public class FabricoTestRunner {
+public class TestRunner {
     // Esta classe serve apenas como ponto de entrada para executar os testes Cucumber
 }
