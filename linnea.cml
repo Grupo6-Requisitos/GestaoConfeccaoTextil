@@ -39,11 +39,13 @@ BoundedContext FabricaDeConfeccaoUnificado implements FabricaDeConfeccao {
 	Aggregate Modelo {
 		Entity Modelo {
 			aggregateRoot
+
 			-ModeloId id
 			String referencia
 			String nome
 			String imagemUrl
 			List<@InsumoPadrao> insumosPadrao
+			
 			Repository ModeloRepository {
 				salvar(@Modelo modelo);
 				@Modelo buscarPorId(@ModeloId modeloId);

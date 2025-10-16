@@ -27,6 +27,8 @@
             <version>1.7</version>
         </dependency>
 
+        \dev\com\linnea\dominio\principal\modelo\cadastrar_modelo.feature
+
         <!-- test (JUnit 5 + Cucumber) -->
         <dependency>
             <groupId>io.cucumber</groupId>
