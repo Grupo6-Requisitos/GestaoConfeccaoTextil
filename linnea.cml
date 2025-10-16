@@ -1,0 +1,235 @@
+Domain FabricaDeConfeccao {}
+
+BoundedContext FabricaDeConfeccaoUnificado implements FabricaDeConfeccao {
+
+	Aggregate Fabrico {
+		Entity Fabrico {
+			aggregateRoot
+			-FabricoId id
+			String nomeFantasia
+			String cnpj
+			Repository FabricoRepository {
+				salvar(@Fabrico fabrico);
+				@Fabrico buscarPorId(@FabricoId fabricoId);
+			}
+		}
+		ValueObject FabricoId { String id }
+	}
+
+	Aggregate Usuario {
+		Entity Usuario {
+			aggregateRoot
+			-UsuarioId id
+			-FabricoId fabricoId
+			String nome
+			@Email email
+			String senhaHash
+			PerfilUsuario perfil
+			Repository UsuarioRepository {
+				salvar(@Usuario usuario);
+				@Usuario buscarPorId(@UsuarioId usuarioId);
+				@Usuario buscarPorEmail(@Email email);
+			}
+		}
+		ValueObject UsuarioId { String id }
+		ValueObject Email { String endereco }
+		enum PerfilUsuario { GESTOR, OPERACIONAL }
+	}
+
+	Aggregate Modelo {
+		Entity Modelo {
+			aggregateRoot
+			-ModeloId id
+			String referencia
+			String nome
+			String imagemUrl
+			List<@InsumoPadrao> insumosPadrao
+			Repository ModeloRepository {
+				salvar(@Modelo modelo);
+				@Modelo buscarPorId(@ModeloId modeloId);
+				@Modelo buscarPorReferencia(String referencia);
+				List<@Modelo> listarTodos();
+			}
+		}
+		ValueObject ModeloId { String id }
+		ValueObject InsumoPadrao {
+			-InsumoId insumoId
+			float quantidadeSugerida
+		}
+	}
+
+	Aggregate Insumo {
+		Entity Insumo {
+			aggregateRoot
+			-InsumoId id
+			String nome
+			String unidadeDeMedida
+			float custoUnitario
+			Repository InsumoRepository {
+				salvar(@Insumo insumo);
+				@Insumo buscarPorId(@InsumoId insumoId);
+				List<@Insumo> listarTodos();
+			}
+		}
+		ValueObject InsumoId { String id }
+	}
+	
+	Aggregate Cliente {
+		Entity Cliente {
+			aggregateRoot
+			-ClienteId id
+			String nome
+			String telefone
+			String email
+			Repository ClienteRepository {
+				salvar(@Cliente cliente);
+				@Cliente buscarPorId(@ClienteId clienteId);
+				List<@Cliente> listarTodos();
+			}
+		}
+		ValueObject ClienteId { String id }
+	}
+
+	Aggregate Pedido {
+		Entity Pedido {
+			aggregateRoot
+			-PedidoId id
+			-ClienteId clienteId
+			Date dataPedido
+			Date dataEntregaPrevista
+			Date dataEntregaRealizada
+			StatusPedido status
+			List<@ItemDePedido> itens
+			Repository PedidoRepository {
+				salvar(@Pedido pedido);
+				@Pedido buscarPorId(@PedidoId pedidoId);
+				List<@Pedido> listarPorCliente(@ClienteId clienteId);
+				List<@Pedido> listarPorStatus(@StatusPedido status);
+			}
+		}
+		Entity ItemDePedido {
+			-ItemDePedidoId id
+			-ModeloId modeloId
+			@Grade gradeSolicitada
+		}
+		ValueObject PedidoId { String id }
+		ValueObject ItemDePedidoId { String id }
+		enum StatusPedido { RECEBIDO, EM_PRODUCAO, ENTREGUE, CANCELADO }
+	}
+
+	Aggregate FichaTecnica {
+		Entity FichaTecnica {
+			aggregateRoot
+			-FichaTecnicaId id
+			-ModeloId modeloId
+			-PedidoId pedidoId
+			-Grade grade
+			StatusFichaTecnica statusGeral
+			Date dataCriacao
+			Repository FichaTecnicaRepository {
+				salvar(@FichaTecnica fichaTecnica);
+				@FichaTecnica buscarPorId(@FichaTecnicaId fichaTecnicaId);
+				List<@FichaTecnica> listarPorStatus(@StatusFichaTecnica status);
+				List<@FichaTecnica> listarPorPedido(@PedidoId pedidoId);
+			}
+		}
+		Entity Grade {
+			-GradeId id
+			List<@ItemDaGrade> itens
+			int quantidadeTotal
+		}
+		ValueObject FichaTecnicaId { String id }
+		ValueObject GradeId { String id }
+		ValueObject ItemDaGrade { String cor, String tamanho, int quantidade }
+		enum StatusFichaTecnica { A_FAZER, EM_PRODUCAO, CONCLUIDO }
+	}
+
+	Aggregate Movimentacao {
+		Entity Movimentacao {
+			aggregateRoot
+			-MovimentacaoId id
+			-FichaTecnicaId fichaTecnicaId
+			-EtapaId etapaId
+			StatusMovimentacao status
+			Date dataInicio
+			Date dataFim
+			Repository MovimentacaoRepository {
+				salvar(@Movimentacao movimentacao);
+				@Movimentacao buscarPorId(@MovimentacaoId movimentacaoId);
+				@Movimentacao buscarAtivaPorFichaTecnica(@FichaTecnicaId fichaTecnicaId);
+				List<@Movimentacao> listarPorFichaTecnica(@FichaTecnicaId fichaTecnicaId);
+			}
+		}
+		Entity Operacao {
+			-OperacaoId id
+			-MovimentacaoId movimentacaoId
+			-ParceiroId parceiroId
+			String nome
+			@Grade gradeEnviada
+			StatusOperacao status
+			float custoDaOperacao
+			Service ProducaoServico {
+				iniciarNovaMovimentacao(@FichaTecnicaId fichaTecnicaId, @EtapaId proximaEtapaId);
+				dividirOperacao(@MovimentacaoId movimentacaoId, Map<@ParceiroId, @Grade> distribuicao);
+				registrarRetorno(@OperacaoId operacaoId, @Grade gradeDeRetorno, String observacoes);
+			}
+		}
+		Entity RegistroDeRetorno {
+			-RegistroDeRetornoId id
+			-OperacaoId operacaoId
+			Date dataRetorno
+			@Grade gradeDeRetorno
+			String observacoes
+		}
+		ValueObject MovimentacaoId { String id }
+		ValueObject OperacaoId { String id }
+		ValueObject RegistroDeRetornoId { String id }
+		enum StatusMovimentacao { EM_ANDAMENTO, CONCLUIDO }
+		enum StatusOperacao { ENVIADO, RETORNANDO, CONCLUIDO }
+	}
+
+	Aggregate Etapa {
+		Entity Etapa {
+			aggregateRoot
+			-EtapaId id
+			String nome
+			int ordem
+			Repository EtapaRepository {
+				salvar(@Etapa etapa);
+				@Etapa buscarPorId(@EtapaId etapaId);
+				List<@Etapa> listarOrdenadoPorOrdem();
+			}
+		}
+		ValueObject EtapaId { String id }
+	}
+
+	Aggregate Parceiro {
+		Entity Parceiro {
+			aggregateRoot
+			-ParceiroId id
+			String nome
+			String telefone
+			Repository ParceiroRepository {
+				salvar(@Parceiro parceiro);
+				@Parceiro buscarPorId(@ParceiroId parceiroId);
+				List<@Parceiro> listarTodos();
+			}
+		}
+		ValueObject ParceiroId { String id }
+	}
+	
+	Aggregate ListaDeTamanhos {
+		Entity ListaDeTamanhos {
+			aggregateRoot
+			-ListaDeTamanhosId id
+			String nome
+			List<String> tamanhos
+			Repository ListaDeTamanhosRepository {
+				salvar(@ListaDeTamanhos listaDeTamanhos);
+				@ListaDeTamanhos buscarPorId(@ListaDeTamanhosId listaDeTamanhosId);
+				List<@ListaDeTamanhos> listarTodos();
+			}
+		}
+		ValueObject ListaDeTamanhosId { String id }
+	}
+}
