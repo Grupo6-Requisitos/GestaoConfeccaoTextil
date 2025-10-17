@@ -24,6 +24,8 @@ public class FabricoService {
         return fabrico;
     }
 
+    // Autor: Arthur
+    // Funcionalidade Editar Fabrico
     public Fabrico editarFabrico(String fabricoId, String novoNomeFantasia, String novoCnpj) {
         FabricoId id = FabricoId.novo(fabricoId);
         
