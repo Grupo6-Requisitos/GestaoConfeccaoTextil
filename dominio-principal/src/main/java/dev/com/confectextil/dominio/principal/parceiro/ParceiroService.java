@@ -1,5 +1,9 @@
 package dev.com.confectextil.dominio.principal.parceiro;
 
+import dev.com.confectextil.dominio.principal.Parceiro;
+
+import java.util.List;
+
 public class ParceiroService {
     private final ParceiroRepositorio repositorio;
 
@@ -10,5 +14,8 @@ public class ParceiroService {
         ParceiroId parceiroId = new ParceiroId(id);
         Parceiro parceiro = new Parceiro(parceiroId, nome, telefone);
         repositorio.salvar(parceiro);
+    }
+    public List<Parceiro> listarTodos(){
+        return repositorio.listarTodos();
     }
 }

@@ -1,4 +1,6 @@
-package dev.com.confectextil.dominio.principal.parceiro;
+package dev.com.confectextil.dominio.principal;
+
+import dev.com.confectextil.dominio.principal.parceiro.ParceiroId;
 
 import java.util.Objects;
 

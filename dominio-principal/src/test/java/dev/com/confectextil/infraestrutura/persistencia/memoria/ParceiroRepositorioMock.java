@@ -1,6 +1,6 @@
 package dev.com.confectextil.infraestrutura.persistencia.memoria;
 
-import dev.com.confectextil.dominio.principal.parceiro.Parceiro;
+import dev.com.confectextil.dominio.principal.Parceiro;
 import dev.com.confectextil.dominio.principal.parceiro.ParceiroId;
 import dev.com.confectextil.dominio.principal.parceiro.ParceiroRepositorio;
 

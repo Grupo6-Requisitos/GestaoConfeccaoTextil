@@ -1,5 +1,7 @@
 package dev.com.confectextil.dominio.principal.parceiro;
 
+import dev.com.confectextil.dominio.principal.Parceiro;
+
 import java.util.List;
 
 public interface ParceiroRepositorio {
