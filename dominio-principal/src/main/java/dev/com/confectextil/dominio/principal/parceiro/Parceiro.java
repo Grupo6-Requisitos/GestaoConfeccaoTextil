@@ -51,7 +51,7 @@ public class Parceiro {
         return Objects.equals(id, p.id);
     }
     @Override
-    public int hashCode() {
+    public int hashCode(){
         return Objects.hash(id);
     }
 }
