@@ -10,6 +10,8 @@ public class FabricoService {
         this.repository = repository;
     }
 
+    // Autor: Arthur
+    // Funcionalidades Cadastrar Fabrico
     public Fabrico cadastrarFabrico(String fabricoId, String nomeFantasia, String cnpj) {
         FabricoId id = FabricoId.novo(fabricoId);
         
