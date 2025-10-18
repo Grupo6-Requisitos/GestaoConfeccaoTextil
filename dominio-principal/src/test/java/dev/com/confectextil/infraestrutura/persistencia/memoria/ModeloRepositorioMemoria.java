@@ -28,7 +28,13 @@ public class ModeloRepositorioMemoria implements ModeloRepository {
         return new ArrayList<>(armazenamento.values());
     }
 
+    @Override
+    public void removerPorReferencia(String referencia) {
+        armazenamento.remove(referencia);
+    }
+
     public void limpar() {
         armazenamento.clear();
     }
+
 }
