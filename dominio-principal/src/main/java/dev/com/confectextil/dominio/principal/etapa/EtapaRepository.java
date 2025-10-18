@@ -11,5 +11,6 @@ public interface EtapaRepository {
     Etapa editar(Etapa etapa);
 
     Optional<Etapa> buscarPorId(EtapaId etapaId);
-    
+
+    void excluir(EtapaId id);
 }

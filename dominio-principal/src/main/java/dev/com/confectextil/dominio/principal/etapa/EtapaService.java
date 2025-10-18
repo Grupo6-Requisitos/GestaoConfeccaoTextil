@@ -70,8 +70,6 @@ public class EtapaService {
         });
     }
 
-
-    
     public boolean existe(String etapaId) {
         EtapaId id = EtapaId.novo(etapaId);
         return repository.buscarPorId(id).isPresent();
@@ -82,4 +80,10 @@ public class EtapaService {
         return repository.buscarPorId(id).orElse(null);
     }
 
+    public void excluirEtapa(String etapaId) {
+        EtapaId id = EtapaId.novo(etapaId);
+        Etapa etapa = repository.buscarPorId(id)
+                .orElseThrow(() -> new IllegalArgumentException("Etapa nao encontrada para exclusao."));
+        repository.excluir(id);
+    }
 }

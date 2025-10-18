@@ -42,4 +42,8 @@ public class EtapaRepositorioMemoria implements EtapaRepository {
         armazenamento.clear();
     }
 
+    @Override
+    public void excluir(EtapaId etapaId){
+        armazenamento.remove(etapaId);
+    }
 }
