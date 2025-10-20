@@ -18,51 +18,49 @@ public class ParceiroStepDefinitions {
     private ParceiroRepositorio repositorio;
     private ParceiroService service;
     private Exception excecaoCapturada;
-    private Parceiro parceiroEmContexto;
+    private String idEmContexto;
     private List<Parceiro> listaDeParceiros;
-    private String idCadastro, nomeCadastro, telefoneCadastro;
 
     @Before
     public void setup() {
         repositorio = new ParceiroRepositorioMemoria();
         service = new ParceiroService(repositorio);
         excecaoCapturada = null;
-        parceiroEmContexto = null;
+        idEmContexto = null;
         listaDeParceiros = null;
     }
 
     @Dado("que eu tenho um ID {string}, nome {string} e telefone {string}")
     public void queEuTenhoUmIdNomeETelefone(String id, String nome, String telefone) {
-        this.idCadastro = id;
-        this.nomeCadastro = nome;
-        this.telefoneCadastro = telefone;
+        this.idEmContexto = id;
+        try {
+            service.cadastrar(id, nome, telefone);
+        } catch (Exception e) {
+            this.excecaoCapturada = e;
+        }
     }
 
     @Quando("eu cadastrar o parceiro")
     public void euCadastrarOParceiro() {
-        try {
-            service.cadastrar(idCadastro, nomeCadastro, telefoneCadastro);
-        } catch (Exception e) {
-            excecaoCapturada = e;
-        }
     }
 
     @Entao("o parceiro com ID {string} deve estar registrado no sistema")
     public void oParceiroComIdDeveEstarRegistradoNoSistema(String idEsperado) {
-        this.parceiroEmContexto = repositorio.buscarPorId(new ParceiroId(idEsperado)).orElse(null);
-        assertNotNull(parceiroEmContexto, "Parceiro nao foi salvo no repositorio");
+        assertTrue(repositorio.buscarPorId(new ParceiroId(idEsperado)).isPresent(), "Parceiro nao foi salvo no repositorio");
     }
 
     @Dado("que existe um Parceiro cadastrado com id {string}, nome {string} e telefone {string}")
     public void que_existe_um_parceiro_cadastrado_com_id_nome_e_telefone(String id, String nome, String telefone) {
+        this.idEmContexto = id;
         service.cadastrar(id, nome, telefone);
     }
 
     @Quando("eu edito o Parceiro {string} alterando:")
     public void eu_edito_o_parceiro_alterando(String id, DataTable dataTable) {
+        this.idEmContexto = id;
         Map<String, String> alteracoes = dataTable.asMap();
         try {
-            this.parceiroEmContexto = service.editar(id, alteracoes.get("nome"), alteracoes.get("telefone"));
+            service.editar(id, alteracoes.get("nome"), alteracoes.get("telefone"));
         } catch (Exception e) {
             this.excecaoCapturada = e;
         }
@@ -70,9 +68,10 @@ public class ParceiroStepDefinitions {
     
     @Quando("eu tento editar o Parceiro {string} alterando:")
     public void eu_tento_editar_o_parceiro_alterando(String id, DataTable dataTable) {
+        this.idEmContexto = id;
         Map<String, String> alteracoes = dataTable.asMap();
         try {
-            this.parceiroEmContexto = service.editar(id, alteracoes.get("nome"), alteracoes.get("telefone"));
+            service.editar(id, alteracoes.get("nome"), alteracoes.get("telefone"));
         } catch (Exception e) {
             this.excecaoCapturada = e;
         }
@@ -81,13 +80,12 @@ public class ParceiroStepDefinitions {
     @Entao("o parceiro com id {string} deve ser atualizado com sucesso")
     public void o_parceiro_com_id_deve_ser_atualizado_com_sucesso(String id) {
         assertNull(excecaoCapturada);
-        Parceiro parceiroAtualizado = repositorio.buscarPorId(new ParceiroId(id)).orElse(null);
-        assertNotNull(parceiroAtualizado);
-        this.parceiroEmContexto = parceiroAtualizado;
+        assertTrue(repositorio.buscarPorId(new ParceiroId(id)).isPresent());
     }
     
     @Dado("que não existe um Parceiro com id {string}")
     public void que_nao_existe_um_parceiro_com_id(String id) {
+        this.idEmContexto = id;
         assertFalse(repositorio.buscarPorId(new ParceiroId(id)).isPresent());
     }
 
@@ -123,8 +121,9 @@ public class ParceiroStepDefinitions {
 
     @Quando("eu solicitar os detalhes do parceiro com id {string}")
     public void eu_solicitar_os_detalhes_do_parceiro_com_id(String id) {
+        this.idEmContexto = id;
         try {
-            this.parceiroEmContexto = service.buscarPorId(id);
+            service.buscarPorId(id);
         } catch (Exception e) {
             this.excecaoCapturada = e;
         }
@@ -132,8 +131,9 @@ public class ParceiroStepDefinitions {
 
     @Quando("eu tento solicitar os detalhes do parceiro com id {string}")
     public void eu_tento_solicitar_os_detalhes_do_parceiro_com_id(String id) {
+        this.idEmContexto = id;
         try {
-            this.parceiroEmContexto = service.buscarPorId(id);
+            service.buscarPorId(id);
         } catch (Exception e) {
             this.excecaoCapturada = e;
         }
@@ -142,26 +142,26 @@ public class ParceiroStepDefinitions {
     @Entao("eu devo receber os detalhes do parceiro")
     public void eu_devo_receber_os_detalhes_do_parceiro() {
         assertNull(excecaoCapturada);
-        assertNotNull(parceiroEmContexto);
+        assertTrue(repositorio.buscarPorId(new ParceiroId(idEmContexto)).isPresent());
     }
 
     @Entao("o nome do parceiro deve ser {string}")
     public void o_nome_do_parceiro_deve_ser(String nomeEsperado) {
-        assertNotNull(parceiroEmContexto);
-        assertEquals(nomeEsperado, parceiroEmContexto.getNome());
+        Parceiro parceiro = repositorio.buscarPorId(new ParceiroId(idEmContexto))
+            .orElseThrow(() -> new AssertionError("Parceiro não encontrado no repositório para verificação."));
+        assertEquals(nomeEsperado, parceiro.getNome());
     }
-
-
 
     @Entao("o telefone do parceiro deve ser {string}")
     public void o_telefone_do_parceiro_deve_ser(String telefoneEsperado) {
-        assertNotNull(parceiroEmContexto);
-        assertEquals(telefoneEsperado, parceiroEmContexto.getTelefone());
+        Parceiro parceiro = repositorio.buscarPorId(new ParceiroId(idEmContexto))
+            .orElseThrow(() -> new AssertionError("Parceiro não encontrado no repositório para verificação."));
+        assertEquals(telefoneEsperado, parceiro.getTelefone());
     }
     
     @Entao("uma excecao deve ser lancada com a mensagem {string}")
     public void uma_excecao_deve_ser_lancada_com_a_mensagem(String mensagemEsperada) {
-        assertNotNull(excecaoCapturada);
+        assertNotNull(excecaoCapturada, "Nenhuma exceção foi lançada, mas era esperada.");
         assertTrue(excecaoCapturada.getMessage().contains(mensagemEsperada));
     }
 }
