@@ -17,6 +17,7 @@ O sistema atende dois contextos de negócio:
 
 <details closed>
 <summary> 🗺️ Mapas de Historias do Usuário</summary>
+<br>
 <img width="1319" alt="print-mapa-historia-1" src="https://github.com/user-attachments/assets/fba698dc-10d2-4831-9923-49360df76491" >
 <img width="1319" alt="print-mapa-historia-2" src="https://github.com/user-attachments/assets/be0e689e-9ec1-48ce-b069-6974120198ed" >
 <img width="1319" alt="print-mapa-historia-3" src="https://github.com/user-attachments/assets/c228f991-9131-4e26-afec-1a6372b9064a" >
@@ -26,6 +27,18 @@ O sistema atende dois contextos de negócio:
 </details>
 <details closed>
 <summary> ✏️ Protótipos de Baixa Fidelidade</summary>
+<br>
+Visualizar e Adicionar Modelo:
+<img width="1319" alt="protipo-baixa-visualizar-adicionar-modelo" src="https://github.com/user-attachments/assets/2976ef29-08c4-4de4-8fd6-2ed97841ed51" >
+<br>
+Editar Modelo:
+<img width="1319" alt="protipo-baixa-editar-modelo" src="https://github.com/user-attachments/assets/4e5f7e70-e059-4934-aa86-249437ca6716" >
+<br>
+Apagar Modelo:
+<img width="1319" alt="protipo-baixa-apagar-modelo" src="https://github.com/user-attachments/assets/cb40c6ea-c387-4727-864b-16ba5a47ab99" >
+<br>
+Visualizar Modelo Específico:
+<img width="1319" alt="protipo-baixa-visualizar-especifico-modelo" src="https://github.com/user-attachments/assets/f2f3555c-439a-4fd4-9674-e52904cc5f6c" >
 </details>
 
 ## 👥 Integrantes do Grupo
