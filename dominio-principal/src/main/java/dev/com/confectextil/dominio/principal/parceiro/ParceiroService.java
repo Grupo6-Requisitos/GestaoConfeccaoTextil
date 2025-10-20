@@ -1,20 +1,40 @@
 package dev.com.confectextil.dominio.principal.parceiro;
 
 import dev.com.confectextil.dominio.principal.Parceiro;
-
 import java.util.List;
 
 public class ParceiroService {
     private final ParceiroRepositorio repositorio;
 
-    public ParceiroService (ParceiroRepositorio repositorio){
+    public ParceiroService(ParceiroRepositorio repositorio){
         this.repositorio = repositorio;
     }
+
     public void cadastrar(String id, String nome, String telefone){
         ParceiroId parceiroId = new ParceiroId(id);
+        if (repositorio.buscarPorId(parceiroId).isPresent()) {
+            throw new IllegalArgumentException("Já existe um parceiro com o ID fornecido.");
+        }
         Parceiro parceiro = new Parceiro(parceiroId, nome, telefone);
         repositorio.salvar(parceiro);
     }
+
+    public Parceiro editar(String id, String novoNome, String novoTelefone) {
+        ParceiroId parceiroId = new ParceiroId(id);
+
+        Parceiro parceiro = repositorio.buscarPorId(parceiroId)
+            .orElseThrow(() -> new IllegalArgumentException("Parceiro não encontrado"));
+
+        if (novoNome != null && !novoNome.isBlank()) {
+            parceiro.alterarNome(novoNome);
+        }
+        if (novoTelefone != null && !novoTelefone.isBlank()) {
+            parceiro.alterarTelefone(novoTelefone);
+        }
+
+        return repositorio.editar(parceiro);
+    }
+
     public List<Parceiro> listarTodos(){
         return repositorio.listarTodos();
     }
