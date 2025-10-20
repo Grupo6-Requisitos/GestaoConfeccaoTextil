@@ -6,7 +6,6 @@ import dev.com.confectextil.dominio.principal.modelo.ModeloRepository;
 import dev.com.confectextil.dominio.principal.modelo.ModeloService;
 import dev.com.confectextil.infraestrutura.persistencia.memoria.InsumoRepositorioMemoria;
 import dev.com.confectextil.infraestrutura.persistencia.memoria.ModeloRepositorioMemoria;
-
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.Before;
 import io.cucumber.java.pt.*;
@@ -27,9 +26,8 @@ public class ModeloStepDefinitions {
     private ModeloRepository modeloRepository;
     private InsumoService insumoService;
     private ModeloService modeloService;
-
     private Exception excecaoCapturada;
-    private Modelo modeloSalvo;
+    private String referenciaEmContexto;
     private List<Modelo> listaDeModelosResultante;
     private Map<String, String> dadosDoModelo;
     private List<ModeloService.InsumoPadraoDTO> dadosDosInsumos;
@@ -41,10 +39,26 @@ public class ModeloStepDefinitions {
         this.insumoService = new InsumoService(insumoRepository);
         this.modeloService = new ModeloService(modeloRepository, insumoRepository);
         this.excecaoCapturada = null;
-        this.modeloSalvo = null;
+        this.referenciaEmContexto = null;
         this.dadosDosInsumos = Collections.emptyList();
     }
 
+    private void executarCadastro() {
+        if (excecaoCapturada == null) {
+            try {
+                this.referenciaEmContexto = dadosDoModelo.get("referencia");
+                modeloService.cadastrarModelo(
+                    dadosDoModelo.get("referencia"),
+                    dadosDoModelo.get("nome"),
+                    dadosDoModelo.get("imagemUrl"),
+                    dadosDosInsumos
+                );
+            } catch (Exception e) {
+                this.excecaoCapturada = e;
+            }
+        }
+    }
+    
     @Dado("que eu sou um usuário {string} autenticado")
     public void que_eu_sou_um_usuario_autenticado(String perfil) {
     }
@@ -84,65 +98,48 @@ public class ModeloStepDefinitions {
             .collect(Collectors.toList());
     }
 
-    private void executarCadastro() {
-        if (excecaoCapturada == null && modeloSalvo == null) {
-            try {
-                modeloSalvo = modeloService.cadastrarModelo(
-                    dadosDoModelo.get("referencia"),
-                    dadosDoModelo.get("nome"),
-                    dadosDoModelo.get("imagemUrl"),
-                    dadosDosInsumos
-                );
-            } catch (Exception e) {
-                this.excecaoCapturada = e;
-            }
-        }
-    }
-
     @Entao("o modelo com a referência {string} deve ser salvo com sucesso")
     public void o_modelo_com_a_referencia_deve_ser_salvo_com_sucesso(String referencia) {
         executarCadastro();
-        assertNull(excecaoCapturada, "Uma exceção foi lançada inesperadamente: " + (excecaoCapturada != null ? excecaoCapturada.getMessage() : ""));
-        assertNotNull(modeloSalvo, "O modelo não foi salvo.");
-        assertEquals(referencia, modeloSalvo.getReferencia());
+        assertNull(excecaoCapturada);
+        
+        var modeloPersistido = modeloRepository.buscarPorReferencia(referencia);
+        assertTrue(modeloPersistido.isPresent(), "O modelo deveria ter sido salvo no repositório, mas não foi encontrado.");
+        assertEquals(referencia, modeloPersistido.get().getReferencia());
     }
 
     @Entao("o modelo salvo deve ter o nome {string}")
     public void o_modelo_salvo_deve_ter_o_nome(String nome) {
-        assertEquals(nome, modeloSalvo.getNome());
+        Modelo modeloPersistido = modeloRepository.buscarPorReferencia(referenciaEmContexto)
+            .orElseThrow(() -> new AssertionError("Modelo não encontrado no repositório para verificação."));
+        assertEquals(nome, modeloPersistido.getNome());
     }
 
     @Entao("o modelo salvo deve ter {int} insumos padrão")
     public void o_modelo_salvo_deve_ter_insumos_padrao(Integer quantidade) {
-        assertEquals(quantidade, modeloSalvo.getInsumosPadrao().size());
+        Modelo modeloPersistido = modeloRepository.buscarPorReferencia(referenciaEmContexto)
+            .orElseThrow(() -> new AssertionError("Modelo não encontrado no repositório para verificação."));
+        assertEquals(quantidade, modeloPersistido.getInsumosPadrao().size());
     }
 
     @Entao("^o modelo salvo deve conter o insumo de referência \"([^\"]*)\" com quantidade sugerida ([0-9.,]+)$")
     public void o_modelo_salvo_deve_conter_o_insumo_de_referencia_com_quantidade_sugerida(String refInsumo, String qtdRaw) {
-        executarCadastro();
-        assertNotNull(modeloSalvo, "Modelo não está salvo — verifique falhas anteriores.");
+        Modelo modeloPersistido = modeloRepository.buscarPorReferencia(referenciaEmContexto)
+            .orElseThrow(() -> new AssertionError("Modelo não encontrado no repositório para verificação."));
 
         final double expected = parseQuantidade(qtdRaw);
         final double EPS = 1e-6;
 
-        System.out.println("DEBUG - Insumos padrao do modelo (insumoId -> quantidade):");
-        modeloSalvo.getInsumosPadrao().forEach(ip -> {
-            try { System.out.println(" - insumoId=" + ip.insumoId() + " quantidade=" + ip.quantidadeSugerida()); }
-            catch (Exception ignored) {}
-        });
-
-        boolean encontrado = modeloSalvo.getInsumosPadrao().stream()
+        boolean encontrado = modeloPersistido.getInsumosPadrao().stream()
             .anyMatch(insumoPadrao -> {
                 Insumo insumo = insumoRepository.buscarPorReferencia(refInsumo).orElse(null);
                 if (insumo == null) return false;
                 double actual = insumoPadrao.quantidadeSugerida();
-                System.out.println(String.format("DEBUG-COMP: ref='%s' insumoIdEsperado=%s insumoIdAtual=%s expected=%.6f actual=%.6f",
-                        refInsumo, insumo.getId(), insumoPadrao.insumoId(), expected, actual));
                 return insumoPadrao.insumoId().equals(insumo.getId()) && Math.abs(actual - expected) < EPS;
             });
 
         if (!encontrado) {
-            final String lista = modeloSalvo.getInsumosPadrao().stream()
+            final String lista = modeloPersistido.getInsumosPadrao().stream()
                 .map(ip -> ip.insumoId() + ":" + ip.quantidadeSugerida())
                 .collect(Collectors.joining(", "));
             fail("O insumo " + refInsumo + " com quantidade " + expected + " não foi encontrado no modelo. Insumos atuais: [" + lista + "]");
@@ -170,6 +167,7 @@ public class ModeloStepDefinitions {
 
     @Quando("eu cadastro um novo modelo com referência {string} e nome {string}")
     public void eu_cadastro_um_novo_modelo_com_referencia_e_nome(String referencia, String nome) {
+        this.referenciaEmContexto = referencia;
         this.dadosDoModelo = Map.of("referencia", referencia, "nome", nome);
         executarCadastro();
     }
