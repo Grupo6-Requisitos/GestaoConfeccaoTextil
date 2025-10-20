@@ -29,7 +29,7 @@ public class ParceiroStepDefinitions {
         idEmContexto = null;
         listaDeParceiros = null;
     }
-
+    //Cadastrar
     @Dado("que eu tenho um ID {string}, nome {string} e telefone {string}")
     public void queEuTenhoUmIdNomeETelefone(String id, String nome, String telefone) {
         this.idEmContexto = id;
@@ -48,6 +48,45 @@ public class ParceiroStepDefinitions {
     public void oParceiroComIdDeveEstarRegistradoNoSistema(String idEsperado) {
         assertTrue(repositorio.buscarPorId(new ParceiroId(idEsperado)).isPresent(), "Parceiro nao foi salvo no repositorio");
     }
+
+    @Entao("uma excecao deve ser lancada com a mensagem {string}")
+    public void uma_excecao_deve_ser_lancada_com_a_mensagem(String mensagemEsperada) {
+        assertNotNull(excecaoCapturada, "Nenhuma exceção foi lançada, mas era esperada.");
+        assertTrue(excecaoCapturada.getMessage().contains(mensagemEsperada));
+    }
+
+    //Visualizar
+    @Dado("que existem parceiros cadastrados no sistema")
+    public void queExistemParceirosCadastradosNoSistema() {
+        service.cadastrar("P001", "Thiago", "81999998888");
+        service.cadastrar("P002", "Maria", "81988887777");
+    }
+
+    @Dado("que nao existem parceiros cadastrados no sistema")
+    public void queNaoExistemParceirosCadastradosNoSistema(){
+        assertTrue(service.listarTodos().isEmpty());
+    }
+
+    @Quando("solicito para listar todos os parceiros")
+    public void solicitoParaListarTodosOsParceiros(){
+        this.listaDeParceiros = service.listarTodos();
+    }
+
+    @Entao("o sistema deve exibir a lista de parceiros com seus nomes e telefones")
+    public void oSistemaDeveExibirAListaDeParceiros() {
+        assertNotNull(listaDeParceiros);
+        assertEquals(2, listaDeParceiros.size());
+        assertTrue(listaDeParceiros.stream().anyMatch(p -> p.getNome().equals("Thiago")));
+        assertTrue(listaDeParceiros.stream().anyMatch(p -> p.getNome().equals("Maria")));
+    }
+
+    @Entao("o sistema deve informar que nao existem parceiros cadastrados")
+    public void oSistemaDeveInformarQueNaoExistemParceirosCadastrados(){
+        assertNotNull(listaDeParceiros);
+        assertTrue(listaDeParceiros.isEmpty());
+    }
+
+
 
     @Dado("que existe um Parceiro cadastrado com id {string}, nome {string} e telefone {string}")
     public void que_existe_um_parceiro_cadastrado_com_id_nome_e_telefone(String id, String nome, String telefone) {
@@ -89,36 +128,6 @@ public class ParceiroStepDefinitions {
         assertFalse(repositorio.buscarPorId(new ParceiroId(id)).isPresent());
     }
 
-    @Dado("que existem parceiros cadastrados no sistema")
-    public void queExistemParceirosCadastradosNoSistema() {
-        service.cadastrar("P001", "Thiago", "81999998888");
-        service.cadastrar("P002", "Maria", "81988887777");
-    }
-    
-    @Dado("que nao existem parceiros cadastrados no sistema")
-    public void queNaoExistemParceirosCadastradosNoSistema(){
-        assertTrue(service.listarTodos().isEmpty());
-    }
-
-    @Quando("solicito para listar todos os parceiros")
-    public void solicitoParaListarTodosOsParceiros(){
-        this.listaDeParceiros = service.listarTodos();
-    }
-    
-    @Entao("o sistema deve exibir a lista de parceiros com seus nomes e telefones")
-    public void oSistemaDeveExibirAListaDeParceiros() {
-        assertNotNull(listaDeParceiros);
-        assertEquals(2, listaDeParceiros.size());
-        assertTrue(listaDeParceiros.stream().anyMatch(p -> p.getNome().equals("Thiago")));
-        assertTrue(listaDeParceiros.stream().anyMatch(p -> p.getNome().equals("Maria")));
-    }
-
-    @Entao("o sistema deve informar que nao existem parceiros cadastrados")
-    public void oSistemaDeveInformarQueNaoExistemParceirosCadastrados(){
-        assertNotNull(listaDeParceiros);
-        assertTrue(listaDeParceiros.isEmpty());
-    }
-
     @Quando("eu solicitar os detalhes do parceiro com id {string}")
     public void eu_solicitar_os_detalhes_do_parceiro_com_id(String id) {
         this.idEmContexto = id;
@@ -157,11 +166,5 @@ public class ParceiroStepDefinitions {
         Parceiro parceiro = repositorio.buscarPorId(new ParceiroId(idEmContexto))
             .orElseThrow(() -> new AssertionError("Parceiro não encontrado no repositório para verificação."));
         assertEquals(telefoneEsperado, parceiro.getTelefone());
-    }
-    
-    @Entao("uma excecao deve ser lancada com a mensagem {string}")
-    public void uma_excecao_deve_ser_lancada_com_a_mensagem(String mensagemEsperada) {
-        assertNotNull(excecaoCapturada, "Nenhuma exceção foi lançada, mas era esperada.");
-        assertTrue(excecaoCapturada.getMessage().contains(mensagemEsperada));
     }
 }
