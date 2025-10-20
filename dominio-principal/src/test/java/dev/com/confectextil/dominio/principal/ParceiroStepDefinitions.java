@@ -19,6 +19,8 @@ public class ParceiroStepDefinitions {
     private ParceiroService service;
     private Exception excecaoCapturada;
     private String idEmContexto;
+    private String nomeEmContexto;
+    private String telefoneEmContexto;
     private List<Parceiro> listaDeParceiros;
 
     @Before
@@ -28,20 +30,24 @@ public class ParceiroStepDefinitions {
         excecaoCapturada = null;
         idEmContexto = null;
         listaDeParceiros = null;
+        nomeEmContexto = null;
+        telefoneEmContexto = null;
     }
     //Cadastrar
     @Dado("que eu tenho um ID {string}, nome {string} e telefone {string}")
     public void queEuTenhoUmIdNomeETelefone(String id, String nome, String telefone) {
         this.idEmContexto = id;
-        try {
-            service.cadastrar(id, nome, telefone);
-        } catch (Exception e) {
-            this.excecaoCapturada = e;
-        }
+        this.nomeEmContexto = nome;
+        this.telefoneEmContexto = telefone;
     }
 
     @Quando("eu cadastrar o parceiro")
     public void euCadastrarOParceiro() {
+        try {
+            service.cadastrar(this.idEmContexto, this.nomeEmContexto, this.telefoneEmContexto);
+        } catch (Exception e) {
+            this.excecaoCapturada = e;
+        }
     }
 
     @Entao("o parceiro com ID {string} deve estar registrado no sistema")
@@ -53,6 +59,20 @@ public class ParceiroStepDefinitions {
     public void uma_excecao_deve_ser_lancada_com_a_mensagem(String mensagemEsperada) {
         assertNotNull(excecaoCapturada, "Nenhuma exceção foi lançada, mas era esperada.");
         assertTrue(excecaoCapturada.getMessage().contains(mensagemEsperada));
+    }
+
+    @Entao("o nome do parceiro deve ser {string}")
+    public void o_nome_do_parceiro_deve_ser(String nomeEsperado) {
+        Parceiro parceiro = repositorio.buscarPorId(new ParceiroId(idEmContexto))
+                .orElseThrow(() -> new AssertionError("Parceiro não encontrado no repositório para verificação."));
+        assertEquals(nomeEsperado, parceiro.getNome());
+    }
+
+    @Entao("o telefone do parceiro deve ser {string}")
+    public void o_telefone_do_parceiro_deve_ser(String telefoneEsperado) {
+        Parceiro parceiro = repositorio.buscarPorId(new ParceiroId(idEmContexto))
+                .orElseThrow(() -> new AssertionError("Parceiro não encontrado no repositório para verificação."));
+        assertEquals(telefoneEsperado, parceiro.getTelefone());
     }
 
     //Visualizar
@@ -152,19 +172,5 @@ public class ParceiroStepDefinitions {
     public void eu_devo_receber_os_detalhes_do_parceiro() {
         assertNull(excecaoCapturada);
         assertTrue(repositorio.buscarPorId(new ParceiroId(idEmContexto)).isPresent());
-    }
-
-    @Entao("o nome do parceiro deve ser {string}")
-    public void o_nome_do_parceiro_deve_ser(String nomeEsperado) {
-        Parceiro parceiro = repositorio.buscarPorId(new ParceiroId(idEmContexto))
-            .orElseThrow(() -> new AssertionError("Parceiro não encontrado no repositório para verificação."));
-        assertEquals(nomeEsperado, parceiro.getNome());
-    }
-
-    @Entao("o telefone do parceiro deve ser {string}")
-    public void o_telefone_do_parceiro_deve_ser(String telefoneEsperado) {
-        Parceiro parceiro = repositorio.buscarPorId(new ParceiroId(idEmContexto))
-            .orElseThrow(() -> new AssertionError("Parceiro não encontrado no repositório para verificação."));
-        assertEquals(telefoneEsperado, parceiro.getTelefone());
     }
 }
