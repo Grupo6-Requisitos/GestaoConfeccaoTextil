@@ -1,4 +1,19 @@
-#  Linnea - Sistema de Gestão para Confecção Textil
+# 👕 Linnea - Sistema de Gestão para Confecção Têxtil  
+
+O **Linnea** é um sistema de gestão desenvolvido para **organizar, rastrear e otimizar o processo produtivo de confecções têxteis**.  
+Ele foi concebido com base em **Domain-Driven Design (DDD)**, tendo como **core domain** o **controle das etapas da produção** — desde o corte até a expedição — garantindo **padronização, rastreabilidade e visibilidade** em tempo real das fichas técnicas em produção.
+
+## 🧭 Visão Geral do Domínio
+
+A confecção têxtil transforma **matérias-primas** (tecidos, aviamentos, insumos) em **peças de vestuário**.  
+O Linnea atua como um **sistema de gestão de processos**, garantindo que todas as **fichas técnicas** — o documento mestre da produção — avancem de forma organizada pelas etapas configuradas.
+
+O sistema atende dois contextos de negócio:
+- **B2B (Business to Business):** a ficha técnica é **vinculada a um pedido de cliente**, permitindo rastreabilidade completa até a entrega.  
+- **B2C (Business to Consumer):** a ficha técnica é **criada diretamente**, produzindo para estoque ou pronta-entrega.
+
+## 🧭 Descrição do Domínio Complero
+<a href="https://docs.google.com/document/d/1I92QvmoRz9IvBtjZ267P0aRUyF94VIwiQr15R9v5hwk/edit?usp=sharing" target="_blank">Docs Dominio</a>
 
 <details closed>
 <summary> 🗺️ Mapas de Historias do Usuário</summary>
