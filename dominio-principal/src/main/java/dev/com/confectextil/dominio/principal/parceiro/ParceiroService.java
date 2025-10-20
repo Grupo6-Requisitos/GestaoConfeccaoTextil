@@ -21,7 +21,6 @@ public class ParceiroService {
 
     public Parceiro editar(String id, String novoNome, String novoTelefone) {
         ParceiroId parceiroId = new ParceiroId(id);
-
         Parceiro parceiro = repositorio.buscarPorId(parceiroId)
             .orElseThrow(() -> new IllegalArgumentException("Parceiro não encontrado"));
 
@@ -33,6 +32,12 @@ public class ParceiroService {
         }
 
         return repositorio.editar(parceiro);
+    }
+
+    public Parceiro buscarPorId(String id) {
+        ParceiroId parceiroId = new ParceiroId(id);
+        return repositorio.buscarPorId(parceiroId)
+            .orElseThrow(() -> new IllegalArgumentException("Parceiro não encontrado"));
     }
 
     public List<Parceiro> listarTodos(){
