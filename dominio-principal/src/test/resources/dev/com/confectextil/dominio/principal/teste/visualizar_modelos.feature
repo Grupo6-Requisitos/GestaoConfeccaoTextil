@@ -11,8 +11,7 @@ Funcionalidade: Visualização de Modelos
       | MOD-11     | Bermuda de Linho     |
       | MOD-12     | Vestido Longo Floral |
     Quando eu solicitar a lista de todos os modelos
-    Entao eu devo receber uma lista com 3 modelos
-    E a lista deve conter um modelo com referencia "MOD-11" e nome "Bermuda de Linho"
+    Entao a lista retornada deve conter 3 modelos, incluindo um com referência "MOD-11" e nome "Bermuda de Linho"
 
   Cenario: Listar modelos quando não há nenhum cadastrado
     Dado que não existem modelos cadastrados no sistema
