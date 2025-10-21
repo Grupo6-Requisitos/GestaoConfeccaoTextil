@@ -1,5 +1,6 @@
 package dev.com.confectextil.dominio.principal;
 
+import dev.com.confectextil.dominio.principal.fabrico.FabricoId;
 import dev.com.confectextil.dominio.principal.fabrico.FabricoRepository;
 import dev.com.confectextil.dominio.principal.fabrico.FabricoService;
 import dev.com.confectextil.infraestrutura.persistencia.memoria.FabricoRepositorioMemoria;
@@ -39,7 +40,6 @@ public class FabricoStepDefinitions {
 
     @Dado("que já existe um Fabrico cadastrado com id {string}")
     public void que_ja_existe_um_fabrico_cadastrado_com_id(String fabricoId) {
-        // Cadastra um Fabrico para simular que já existe
         fabricoService.cadastrarFabrico(
             fabricoId, 
             "Fabrico Existente", 
@@ -129,6 +129,9 @@ public class FabricoStepDefinitions {
             "O ID do Fabrico deveria ser " + fabricoId);
         assertTrue(fabricoService.existe(fabricoId), 
             "O Fabrico deveria existir no repositório");
+        var doRepo = fabricoRepository.buscarPorId(FabricoId.comValor(fabricoId));
+        assertTrue(doRepo.isPresent(), "O Fabrico deveria existir no repositório (validação via repository)");
+        assertEquals(fabricoId, doRepo.get().getId().toString(), "ID no repositório deve coincidir");
     }
 
     @Então("o CNPJ deve ser {string}")
@@ -136,6 +139,9 @@ public class FabricoStepDefinitions {
         assertNotNull(this.fabricoCadastrado, "O Fabrico deveria existir");
         assertEquals(cnpjEsperado, this.fabricoCadastrado.getCnpj(), 
             "O CNPJ deveria ser " + cnpjEsperado);
+        var doRepo = fabricoRepository.buscarPorId(this.fabricoCadastrado.getId());
+        assertTrue(doRepo.isPresent(), "O repositório deveria conter o Fabrico");
+        assertEquals(cnpjEsperado, doRepo.get().getCnpj(), "CNPJ no repositório deve coincidir");
     }
 
     @Então("o sistema deve rejeitar o cadastro por CNPJ inválido")
@@ -146,12 +152,23 @@ public class FabricoStepDefinitions {
             "A exceção deveria ser IllegalArgumentException");
         assertTrue(this.excecaoCapturada.getMessage().contains("CNPJ inválido"), 
             "A mensagem deveria indicar CNPJ inválido");
+         if (this.dadosFabrico != null) {
+            String idTentado = this.dadosFabrico.get("fabricoId");
+            if (idTentado != null) {
+                var doRepo = fabricoRepository.buscarPorId(FabricoId.comValor(idTentado));
+                assertTrue(doRepo.isEmpty(), "Não deveria existir Fabrico salvo para ID " + idTentado);
+            }
+        }
     }
 
     @Então("o sistema deve rejeitar o cadastro")
     public void o_sistema_deve_rejeitar_o_cadastro() {
         assertNotNull(this.excecaoCapturada, 
             "Deveria ter lançado uma exceção ao tentar cadastrar ID duplicado");
+        if (this.fabricoCadastrado != null) {
+            var doRepo = fabricoRepository.buscarPorId(this.fabricoCadastrado.getId());
+            assertTrue(doRepo.isPresent(), "O Fabrico existente deveria permanecer no repositório");
+        }
     }
 
     @Então("exibir a mensagem de erro {string}")
@@ -159,6 +176,13 @@ public class FabricoStepDefinitions {
         assertNotNull(this.excecaoCapturada, "Deveria ter lançado uma exceção");
         assertEquals(mensagemEsperada, this.excecaoCapturada.getMessage(), 
             "A mensagem de erro deveria ser: " + mensagemEsperada);
+        if (this.dadosFabrico != null && this.fabricoCadastrado == null) {
+            String idTentado = this.dadosFabrico.get("fabricoId");
+            if (idTentado != null) {
+                var doRepo = fabricoRepository.buscarPorId(FabricoId.comValor(idTentado));
+                assertTrue(doRepo.isEmpty(), "Não deve existir Fabrico salvo após falha de cadastro");
+            }
+        }
     }
 
     @Então("o Fabrico deve ter o nome {string}")
@@ -166,6 +190,9 @@ public class FabricoStepDefinitions {
         assertNotNull(this.fabricoCadastrado, "O Fabrico deveria existir");
         assertEquals(nomeEsperado, this.fabricoCadastrado.getNomeFantasia(), 
             "O nome fantasia deveria ser " + nomeEsperado);
+        var doRepo = fabricoRepository.buscarPorId(this.fabricoCadastrado.getId());
+        assertTrue(doRepo.isPresent(), "O repositório deveria conter o Fabrico");
+        assertEquals(nomeEsperado, doRepo.get().getNomeFantasia(), "Nome no repositório deve coincidir");
     }
 
     @Então("o CNPJ deve permanecer {string}")
@@ -173,6 +200,9 @@ public class FabricoStepDefinitions {
         assertNotNull(this.fabricoCadastrado, "O Fabrico deveria existir");
         assertEquals(cnpjEsperado, this.fabricoCadastrado.getCnpj(), 
             "O CNPJ deveria permanecer " + cnpjEsperado);
+        var doRepo = fabricoRepository.buscarPorId(this.fabricoCadastrado.getId());
+        assertTrue(doRepo.isPresent(), "O repositório deveria conter o Fabrico");
+        assertEquals(cnpjEsperado, doRepo.get().getCnpj(), "CNPJ no repositório deve permanecer igual");
     }
 
     @Então("o sistema deve exibir a mensagem de erro {string}")
@@ -180,5 +210,9 @@ public class FabricoStepDefinitions {
         assertNotNull(this.excecaoCapturada, "Deveria ter lançado uma exceção");
         assertEquals(mensagemEsperada, this.excecaoCapturada.getMessage(), 
             "A mensagem de erro deveria ser: " + mensagemEsperada);
+        if (this.fabricoCadastrado != null) {
+            var doRepo = fabricoRepository.buscarPorId(this.fabricoCadastrado.getId());
+            assertTrue(doRepo.isPresent(), "O repositório deve permanecer consistente após erro");
+        }
     }
 }
