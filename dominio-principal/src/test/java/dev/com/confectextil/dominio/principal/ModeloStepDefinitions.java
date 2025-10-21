@@ -28,7 +28,6 @@ public class ModeloStepDefinitions {
     private ModeloService modeloService;
     private Exception excecaoCapturada;
     private String referenciaEmContexto;
-    private List<Modelo> listaDeModelosResultante;
     private Map<String, String> dadosDoModelo;
     private List<ModeloService.InsumoPadraoDTO> dadosDosInsumos;
 
@@ -58,7 +57,7 @@ public class ModeloStepDefinitions {
             }
         }
     }
-    
+
     @Dado("que eu sou um usuário {string} autenticado")
     public void que_eu_sou_um_usuario_autenticado(String perfil) {
     }
@@ -102,7 +101,7 @@ public class ModeloStepDefinitions {
     public void o_modelo_com_a_referencia_deve_ser_salvo_com_sucesso(String referencia) {
         executarCadastro();
         assertNull(excecaoCapturada);
-        
+
         var modeloPersistido = modeloRepository.buscarPorReferencia(referencia);
         assertTrue(modeloPersistido.isPresent(), "O modelo deveria ter sido salvo no repositório, mas não foi encontrado.");
         assertEquals(referencia, modeloPersistido.get().getReferencia());
@@ -172,26 +171,42 @@ public class ModeloStepDefinitions {
         executarCadastro();
     }
 
-    @E("eu peço a lista completa de modelos")
-    public void eu_peco_a_lista_completa_de_modelos() {
-        this.listaDeModelosResultante = modeloService.listarTodos();
-    }
-
-    @Entao("a lista de modelos deve conter {int} itens")
-    public void a_lista_de_modelos_deve_conter_itens(Integer quantidade) {
-        assertEquals(quantidade, listaDeModelosResultante.size());
-    }
-
-    @Entao("a lista de modelos deve incluir um modelo com referência {string} e nome {string}")
-    public void a_lista_de_modelos_deve_incluir_um_modelo_com_referencia_e_nome(String referencia, String nome) {
-        boolean encontrado = listaDeModelosResultante.stream()
-            .anyMatch(modelo -> modelo.getReferencia().equals(referencia) && modelo.getNome().equals(nome));
-        assertTrue(encontrado, "O modelo " + referencia + " não foi encontrado na lista.");
-    }
-
     @Dado("não existe um insumo com a referência {string}")
     public void nao_existe_um_insumo_com_a_referencia(String referencia) {
         assertFalse(insumoRepository.buscarPorReferencia(referencia).isPresent());
+    }
+
+    @Dado("que existem os seguintes modelos já cadastrados no sistema:")
+    public void que_existem_os_seguintes_modelos_ja_cadastrados_no_sistema(DataTable dataTable) {
+        dataTable.asMaps().forEach(linha ->
+            modeloService.cadastrarModelo(linha.get("referencia"), linha.get("nome"), null, Collections.emptyList())
+        );
+    }
+
+    @Quando("eu solicitar a lista de todos os modelos")
+    public void eu_solicitar_a_lista_de_todos_os_modelos() {
+    }
+
+    @Entao("a lista retornada deve conter {int} modelos, incluindo um com referência {string} e nome {string}")
+    public void a_lista_retornada_deve_conter_modelos_incluindo_um_com_referencia_e_nome(Integer quantidade, String referencia, String nome) {
+        List<Modelo> modelosPersistidos = modeloService.listarTodos();
+        assertNotNull(modelosPersistidos);
+        assertEquals(quantidade, modelosPersistidos.size());
+        boolean encontrado = modelosPersistidos.stream()
+            .anyMatch(modelo -> modelo.getReferencia().equals(referencia) && modelo.getNome().equals(nome));
+        assertTrue(encontrado, "O modelo com referência " + referencia + " e nome " + nome + " não foi encontrado na lista.");
+    }
+
+    @Dado("que não existem modelos cadastrados no sistema")
+    public void que_nao_existem_modelos_cadastrados_no_sistema() {
+        assertTrue(modeloService.listarTodos().isEmpty());
+    }
+
+    @Entao("eu devo receber uma lista vazia")
+    public void eu_devo_receber_uma_lista_vazia() {
+        List<Modelo> modelosPersistidos = modeloService.listarTodos();
+        assertNotNull(modelosPersistidos);
+        assertTrue(modelosPersistidos.isEmpty());
     }
 
     private double parseQuantidade(String qtdRaw) {
