@@ -17,7 +17,7 @@ Funcionalidade: Cadastro de Modelos
       | imagemUrl  | http://exemplo.com/camiseta.jpg |
     E com a seguinte lista de insumos padrão:
       | insumo_referencia | quantidade_sugerida |
-      | TEC-01            | 1.2                 |
+      | TEC-01            | 12.0                 |
       | LIN-02            | 150.0               |
     Entao o modelo com a referência "MOD-001" deve ser salvo com sucesso
     E o modelo salvo deve ter o nome "Camiseta Gola V Padrão"

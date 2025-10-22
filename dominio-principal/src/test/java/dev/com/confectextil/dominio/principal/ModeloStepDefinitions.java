@@ -8,15 +8,12 @@ import dev.com.confectextil.infraestrutura.persistencia.memoria.InsumoRepositori
 import dev.com.confectextil.infraestrutura.persistencia.memoria.ModeloRepositorioMemoria;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.Before;
+import io.cucumber.java.DataTableType;
 import io.cucumber.java.pt.*;
 
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,200 +23,207 @@ public class ModeloStepDefinitions {
     private ModeloRepository modeloRepository;
     private InsumoService insumoService;
     private ModeloService modeloService;
+
     private Exception excecaoCapturada;
-    private String referenciaEmContexto;
     private Map<String, String> dadosDoModelo;
-    private List<ModeloService.InsumoPadraoDTO> dadosDosInsumos;
+    private List<ModeloService.InsumoPadraoDTO> listaInsumosPadrao;
+    private String referenciaEmContexto;
 
     @Before
-    public void setUp() {
-        this.insumoRepository = new InsumoRepositorioMemoria();
-        this.modeloRepository = new ModeloRepositorioMemoria();
-        this.insumoService = new InsumoService(insumoRepository);
-        this.modeloService = new ModeloService(modeloRepository, insumoRepository);
-        this.excecaoCapturada = null;
-        this.referenciaEmContexto = null;
-        this.dadosDosInsumos = Collections.emptyList();
+    public void setup() {
+        insumoRepository = new InsumoRepositorioMemoria();
+        modeloRepository = new ModeloRepositorioMemoria();
+        insumoService = new InsumoService(insumoRepository);
+        modeloService = new ModeloService(modeloRepository, insumoRepository);
+
+        excecaoCapturada = null;
+        dadosDoModelo = null;
+        listaInsumosPadrao = Collections.emptyList();
+        referenciaEmContexto = null;
     }
 
-    private void executarCadastro() {
+    // Novo: registro do DataTableType para converter direto para InsumoPadraoDTO
+    @DataTableType
+    public ModeloService.InsumoPadraoDTO insumoPadraoDTOEntry(Map<String, String> entry) {
+        String referencia = entry.get("insumo_referencia");
+        String qtdStr = entry.get("quantidade_sugerida").replace(",", "."); // trata vírgula
+        double quantidade = Double.parseDouble(qtdStr);
+        return new ModeloService.InsumoPadraoDTO(referencia, quantidade);
+    }
+
+    private void tentarCadastrarModelo() {
         if (excecaoCapturada == null) {
             try {
-                this.referenciaEmContexto = dadosDoModelo.get("referencia");
+                referenciaEmContexto = dadosDoModelo.get("referencia");
                 modeloService.cadastrarModelo(
-                    dadosDoModelo.get("referencia"),
-                    dadosDoModelo.get("nome"),
-                    dadosDoModelo.get("imagemUrl"),
-                    dadosDosInsumos
+                        dadosDoModelo.get("referencia"),
+                        dadosDoModelo.get("nome"),
+                        dadosDoModelo.get("imagemUrl"),
+                        listaInsumosPadrao
                 );
             } catch (Exception e) {
-                this.excecaoCapturada = e;
+                excecaoCapturada = e;
             }
         }
     }
 
     @Dado("que eu sou um usuário {string} autenticado")
-    public void que_eu_sou_um_usuario_autenticado(String perfil) {
+    public void queEuSouUmUsuarioAutenticado(String perfil) {
+        // Nenhuma ação necessária, pois o sistema não implementa autenticação para os testes.
     }
 
     @Dado("não existe um modelo com a referência {string}")
-    public void nao_existe_um_modelo_com_a_referencia(String referencia) {
+    public void naoExisteUmModeloComAReferencia(String referencia) {
         assertFalse(modeloRepository.buscarPorReferencia(referencia).isPresent());
     }
 
     @Dado("existem os seguintes insumos cadastrados no sistema:")
-    public void existem_os_seguintes_insumos_cadastrados_no_sistema(DataTable dataTable) {
-        List<Map<String, String>> linhas = dataTable.asMaps();
-        for (var linha : linhas) {
+    public void existemOsSeguintesInsumosCadastradosNoSistema(DataTable tabela) {
+        for (Map<String, String> linha : tabela.asMaps()) {
             insumoService.cadastrarInsumo(
-                linha.get("referencia"),
-                linha.get("nome"),
-                linha.get("unidade")
+                    linha.get("referencia"),
+                    linha.get("nome"),
+                    linha.get("unidade")
             );
         }
     }
 
     @Quando("eu tento cadastrar um novo modelo com os seguintes dados:")
-    public void eu_tento_cadastrar_um_novo_modelo_com_os_seguintes_dados(DataTable dataTable) {
-        this.dadosDoModelo = dataTable.asMap();
+    public void euTentoCadastrarUmNovoModeloComOsSeguintesDados(DataTable tabela) {
+        dadosDoModelo = tabela.asMap();
     }
 
+    // Alterado: usa conversão direta para lista de InsumoPadraoDTO
     @E("com a seguinte lista de insumos padrão:")
-    public void com_a_seguinte_lista_de_insumos_padrao(DataTable dataTable) {
-        this.dadosDosInsumos = dataTable.asMaps().stream()
-            .map(linha -> {
-                double quantidade = parseQuantidade(linha.get("quantidade_sugerida"));
-                return new ModeloService.InsumoPadraoDTO(
-                    linha.get("insumo_referencia"),
-                    quantidade
-                );
-            })
-            .collect(Collectors.toList());
+    public void comASeguinteListaDeInsumosPadrao(List<ModeloService.InsumoPadraoDTO> lista) {
+        listaInsumosPadrao = lista;
     }
 
     @Entao("o modelo com a referência {string} deve ser salvo com sucesso")
-    public void o_modelo_com_a_referencia_deve_ser_salvo_com_sucesso(String referencia) {
-        executarCadastro();
-        assertNull(excecaoCapturada);
+    public void oModeloComAReferenciaDeveSerSalvoComSucesso(String referencia) {
+        tentarCadastrarModelo();
+        assertNull(excecaoCapturada, "Não esperava exceção ao salvar modelo.");
 
-        var modeloPersistido = modeloRepository.buscarPorReferencia(referencia);
-        assertTrue(modeloPersistido.isPresent(), "O modelo deveria ter sido salvo no repositório, mas não foi encontrado.");
-        assertEquals(referencia, modeloPersistido.get().getReferencia());
+        var modeloOpt = modeloRepository.buscarPorReferencia(referencia);
+        assertTrue(modeloOpt.isPresent(), "Modelo não encontrado no repositório.");
+        assertEquals(referencia, modeloOpt.get().getReferencia());
     }
 
     @Entao("o modelo salvo deve ter o nome {string}")
-    public void o_modelo_salvo_deve_ter_o_nome(String nome) {
-        Modelo modeloPersistido = modeloRepository.buscarPorReferencia(referenciaEmContexto)
-            .orElseThrow(() -> new AssertionError("Modelo não encontrado no repositório para verificação."));
-        assertEquals(nome, modeloPersistido.getNome());
+    public void oModeloSalvoDeveTerONome(String nomeEsperado) {
+        var modeloOpt = modeloRepository.buscarPorReferencia(referenciaEmContexto);
+        assertTrue(modeloOpt.isPresent(), "Modelo para verificação não encontrado.");
+        assertEquals(nomeEsperado, modeloOpt.get().getNome());
     }
 
     @Entao("o modelo salvo deve ter {int} insumos padrão")
-    public void o_modelo_salvo_deve_ter_insumos_padrao(Integer quantidade) {
-        Modelo modeloPersistido = modeloRepository.buscarPorReferencia(referenciaEmContexto)
-            .orElseThrow(() -> new AssertionError("Modelo não encontrado no repositório para verificação."));
-        assertEquals(quantidade, modeloPersistido.getInsumosPadrao().size());
+    public void oModeloSalvoDeveTerInsumosPadrao(Integer quantidadeEsperada) {
+        var modeloOpt = modeloRepository.buscarPorReferencia(referenciaEmContexto);
+        assertTrue(modeloOpt.isPresent(), "Modelo para verificação não encontrado.");
+        assertEquals(quantidadeEsperada, modeloOpt.get().getInsumosPadrao().size());
     }
 
-    @Entao("^o modelo salvo deve conter o insumo de referência \"([^\"]*)\" com quantidade sugerida ([0-9.,]+)$")
-    public void o_modelo_salvo_deve_conter_o_insumo_de_referencia_com_quantidade_sugerida(String refInsumo, String qtdRaw) {
-        Modelo modeloPersistido = modeloRepository.buscarPorReferencia(referenciaEmContexto)
-            .orElseThrow(() -> new AssertionError("Modelo não encontrado no repositório para verificação."));
+    @Entao("o modelo salvo deve conter o insumo de referência {string} com quantidade sugerida {double}")
+    public void oModeloSalvoDeveConterOInsumoDeReferenciaComQuantidadeSugerida(String referenciaInsumo, double quantidadeEsperada) {
+        var modeloOpt = modeloRepository.buscarPorReferencia(referenciaEmContexto);
+        assertTrue(modeloOpt.isPresent(), "Modelo para verificação não encontrado.");
 
-        final double expected = parseQuantidade(qtdRaw);
-        final double EPS = 1e-6;
+        var modelo = modeloOpt.get();
 
-        boolean encontrado = modeloPersistido.getInsumosPadrao().stream()
-            .anyMatch(insumoPadrao -> {
-                Insumo insumo = insumoRepository.buscarPorReferencia(refInsumo).orElse(null);
-                if (insumo == null) return false;
-                double actual = insumoPadrao.quantidadeSugerida();
-                return insumoPadrao.insumoId().equals(insumo.getId()) && Math.abs(actual - expected) < EPS;
-            });
+        var insumoOpt = insumoRepository.buscarPorReferencia(referenciaInsumo);
+        assertTrue(insumoOpt.isPresent(), "Insumo para verificação não encontrado.");
 
-        if (!encontrado) {
-            final String lista = modeloPersistido.getInsumosPadrao().stream()
-                .map(ip -> ip.insumoId() + ":" + ip.quantidadeSugerida())
-                .collect(Collectors.joining(", "));
-            fail("O insumo " + refInsumo + " com quantidade " + expected + " não foi encontrado no modelo. Insumos atuais: [" + lista + "]");
-        }
+        var idInsumo = insumoOpt.get().getId();
+
+        boolean encontrado = modelo.getInsumosPadrao().stream()
+                .anyMatch(ip -> ip.insumoId().equals(idInsumo) &&
+                        Math.abs(ip.quantidadeSugerida() - quantidadeEsperada) < 0.000001);
+
+        assertTrue(encontrado,
+                "O insumo com referência '" + referenciaInsumo + "' e quantidade sugerida " + quantidadeEsperada + " não foi encontrado no modelo.");
     }
 
     @Dado("já existe um modelo cadastrado com a referência {string}")
-    public void ja_existe_um_modelo_cadastrado_com_a_referencia(String referencia) {
-        modeloService.cadastrarModelo(referencia, "Modelo Duplicado", null, Collections.emptyList());
+    public void jaExisteUmModeloCadastradoComAReferencia(String referencia) {
+        modeloService.cadastrarModelo(referencia, "Modelo Existente", null, Collections.emptyList());
     }
 
     @Entao("o sistema deve retornar um erro informando que {string}")
-    public void o_sistema_deve_retornar_um_erro_informando_que(String mensagem) {
-        executarCadastro();
-        assertNotNull(excecaoCapturada, "Uma exceção era esperada, mas não foi lançada.");
-        assertTrue(excecaoCapturada.getMessage().contains(mensagem));
+    public void oSistemaDeveRetornarUmErroInformandoQue(String mensagemEsperada) {
+        tentarCadastrarModelo();
+        assertNotNull(excecaoCapturada, "Esperava exceção, mas nenhuma foi lançada.");
+        assertTrue(excecaoCapturada.getMessage().contains(mensagemEsperada),
+                "Mensagem de erro esperada não encontrada. Esperado: '" + mensagemEsperada + "', Recebido: '" + excecaoCapturada.getMessage() + "'");
     }
 
     @Dado("existem os seguintes modelos já cadastrados:")
-    public void existem_os_seguintes_modelos_ja_cadastrados(DataTable dataTable) {
-        dataTable.asMaps().forEach(linha ->
-            modeloService.cadastrarModelo(linha.get("referencia"), linha.get("nome"), null, Collections.emptyList())
-        );
+    public void existemOsSeguintesModelosJaCadastrados(DataTable tabela) {
+        for (Map<String, String> linha : tabela.asMaps()) {
+            modeloService.cadastrarModelo(linha.get("referencia"), linha.get("nome"), null, Collections.emptyList());
+        }
     }
 
     @Quando("eu cadastro um novo modelo com referência {string} e nome {string}")
-    public void eu_cadastro_um_novo_modelo_com_referencia_e_nome(String referencia, String nome) {
-        this.referenciaEmContexto = referencia;
-        this.dadosDoModelo = Map.of("referencia", referencia, "nome", nome);
-        executarCadastro();
+    public void euCadastroUmNovoModeloComReferenciaENome(String referencia, String nome) {
+        dadosDoModelo = Map.of("referencia", referencia, "nome", nome);
+        listaInsumosPadrao = Collections.emptyList();
+        referenciaEmContexto = referencia;
+        tentarCadastrarModelo();
+    }
+
+    @Quando("eu peço a lista completa de modelos")
+    public void euPecoAListaCompletaDeModelos() {
+        // A ação de obter a lista será feita no passo de validação.
+    }
+
+    @Entao("a lista de modelos deve conter {int} itens")
+    public void aListaDeModelosDeveConterItens(int quantidadeEsperada) {
+        List<Modelo> modelos = modeloService.listarTodos();
+        assertEquals(quantidadeEsperada, modelos.size());
+    }
+
+    @Entao("a lista de modelos deve incluir um modelo com referência {string} e nome {string}")
+    public void aListaDeModelosDeveIncluirUmModeloComReferenciaENome(String referencia, String nome) {
+        List<Modelo> modelos = modeloService.listarTodos();
+        boolean encontrado = modelos.stream()
+                .anyMatch(m -> m.getReferencia().equals(referencia) && m.getNome().equals(nome));
+        assertTrue(encontrado, "Modelo com referência " + referencia + " e nome " + nome + " não foi encontrado na lista.");
     }
 
     @Dado("não existe um insumo com a referência {string}")
-    public void nao_existe_um_insumo_com_a_referencia(String referencia) {
+    public void naoExisteUmInsumoComAReferencia(String referencia) {
         assertFalse(insumoRepository.buscarPorReferencia(referencia).isPresent());
     }
 
-    @Dado("que existem os seguintes modelos já cadastrados no sistema:")
-    public void que_existem_os_seguintes_modelos_ja_cadastrados_no_sistema(DataTable dataTable) {
-        dataTable.asMaps().forEach(linha ->
-            modeloService.cadastrarModelo(linha.get("referencia"), linha.get("nome"), null, Collections.emptyList())
-        );
-    }
-
-    @Quando("eu solicitar a lista de todos os modelos")
-    public void eu_solicitar_a_lista_de_todos_os_modelos() {
-    }
-
-    @Entao("a lista retornada deve conter {int} modelos, incluindo um com referência {string} e nome {string}")
-    public void a_lista_retornada_deve_conter_modelos_incluindo_um_com_referencia_e_nome(Integer quantidade, String referencia, String nome) {
-        List<Modelo> modelosPersistidos = modeloService.listarTodos();
-        assertNotNull(modelosPersistidos);
-        assertEquals(quantidade, modelosPersistidos.size());
-        boolean encontrado = modelosPersistidos.stream()
-            .anyMatch(modelo -> modelo.getReferencia().equals(referencia) && modelo.getNome().equals(nome));
-        assertTrue(encontrado, "O modelo com referência " + referencia + " e nome " + nome + " não foi encontrado na lista.");
-    }
-
     @Dado("que não existem modelos cadastrados no sistema")
-    public void que_nao_existem_modelos_cadastrados_no_sistema() {
+    public void queNaoExistemModelosCadastradosNoSistema() {
         assertTrue(modeloService.listarTodos().isEmpty());
     }
 
     @Entao("eu devo receber uma lista vazia")
-    public void eu_devo_receber_uma_lista_vazia() {
-        List<Modelo> modelosPersistidos = modeloService.listarTodos();
-        assertNotNull(modelosPersistidos);
-        assertTrue(modelosPersistidos.isEmpty());
+    public void euDevoReceberUmaListaVazia() {
+        List<Modelo> modelos = modeloService.listarTodos();
+        assertNotNull(modelos);
+        assertTrue(modelos.isEmpty());
     }
 
-    private double parseQuantidade(String qtdRaw) {
-        String raw = (qtdRaw == null ? "0" : qtdRaw.trim()).replaceAll("\\s+", "").replace(",", ".");
-        try {
-            return Double.parseDouble(raw);
-        } catch (NumberFormatException nf) {
-            try {
-                NumberFormat nfFormat = NumberFormat.getInstance(Locale.US);
-                return nfFormat.parse(raw).doubleValue();
-            } catch (ParseException pe) {
-                throw new RuntimeException("Erro ao converter quantidade esperada: '" + qtdRaw + "'", pe);
-            }
+    // ** IMPLEMENTAÇÃO DO STEP QUE ESTAVA FALTANDO - 1 **
+    @Dado("que existem os seguintes modelos já cadastrados no sistema:")
+    public void queExistemOsSeguintesModelosJaCadastradosNoSistema(DataTable tabela) {
+        for (Map<String, String> linha : tabela.asMaps()) {
+            modeloService.cadastrarModelo(linha.get("referencia"), linha.get("nome"), null, Collections.emptyList());
         }
     }
+
+    // ** IMPLEMENTAÇÃO DO STEP QUE ESTAVA FALTANDO - 2 **
+    @Entao("a lista retornada deve conter {int} modelos, incluindo um com referência {string} e nome {string}")
+    public void aListaRetornadaDeveConterModelosIncluindoUmComReferenciaENome(Integer quantidadeEsperada, String referencia, String nome) {
+        List<Modelo> modelos = modeloService.listarTodos();
+        assertEquals(quantidadeEsperada.intValue(), modelos.size(), "Quantidade de modelos diferente do esperado.");
+
+        boolean encontrado = modelos.stream()
+                .anyMatch(m -> m.getReferencia().equals(referencia) && m.getNome().equals(nome));
+        assertTrue(encontrado, "Modelo com referência " + referencia + " e nome " + nome + " não foi encontrado na lista.");
+    }
+
 }

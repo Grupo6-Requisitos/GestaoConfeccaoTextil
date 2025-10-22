@@ -28,7 +28,7 @@ public class VisualizarModelosStepDefinitions {
         this.modeloService = new ModeloService(modeloRepository, insumoRepository);
     }
 
-    @Dado("que existem os seguintes modelos já cadastrados no sistema:")
+    @Dado("que existem os seguintes modelos já cadastrados no sistema para visualização:")
     public void que_existem_os_seguintes_modelos_ja_cadastrados_no_sistema(DataTable dataTable) {
         List<Map<String, String>> modelos = dataTable.asMaps();
         for (Map<String, String> modelo : modelos) {
@@ -41,7 +41,7 @@ public class VisualizarModelosStepDefinitions {
         }
     }
 
-    @Quando("eu solicitar a lista de todos os modelos")
+    @Quando("eu solicitar a lista de todos os modelos existentes")
     public void eu_solicitar_a_lista_de_todos_os_modelos() {
     }
 
@@ -62,12 +62,15 @@ public class VisualizarModelosStepDefinitions {
         assertTrue(encontrado, "O modelo com referência " + referencia + " e nome " + nome + " não foi encontrado na lista.");
     }
 
-    @Dado("que não existem modelos cadastrados no sistema")
+    @Dado("que não há modelos cadastrados no sistema")
     public void que_nao_existem_modelos_cadastrados_no_sistema() {
         assertTrue(modeloService.listarTodos().isEmpty());
     }
+    @Quando("eu pedir a lista de todos os modelos")
+    public void eu_pedir_a_lista_de_todos_os_modelos() {
+    }
 
-    @Entao("eu devo receber uma lista vazia")
+    @Entao("eu devo receber uma lista vazia dos modelos")
     public void eu_devo_receber_uma_lista_vazia() {
         List<Modelo> modelosPersistidos = modeloService.listarTodos();
         assertNotNull(modelosPersistidos);

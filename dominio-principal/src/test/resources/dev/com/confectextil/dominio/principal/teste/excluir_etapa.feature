@@ -16,6 +16,6 @@ Funcionalidade: Excluir Etapa
     Entao o sistema deve remover a etapa do cadastro
 
   Cenario: Tentar excluir uma etapa inexistente
-    Dado que nao existe uma etapa cadastrada com ID "E999"
+    Dado que não existe uma etapa cadastrada com ID "E999"
     Quando eu solicitar a exclusao da etapa com ID "E999"
-    Entao o sistema deve informar "Etapa nao encontrada para exclusao."
+    Entao o sistema deve informar "Etapa não encontrada para exclusão."

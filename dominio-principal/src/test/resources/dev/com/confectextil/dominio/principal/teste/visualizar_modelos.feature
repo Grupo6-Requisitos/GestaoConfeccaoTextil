@@ -10,10 +10,10 @@ Funcionalidade: Visualização de Modelos
       | MOD-10     | Camisa Social Slim   |
       | MOD-11     | Bermuda de Linho     |
       | MOD-12     | Vestido Longo Floral |
-    Quando eu solicitar a lista de todos os modelos
+    Quando eu solicitar a lista de todos os modelos existentes
     Entao a lista retornada deve conter 3 modelos, incluindo um com referência "MOD-11" e nome "Bermuda de Linho"
 
   Cenario: Listar modelos quando não há nenhum cadastrado
-    Dado que não existem modelos cadastrados no sistema
-    Quando eu solicitar a lista de todos os modelos
+    Dado que não há modelos cadastrados no sistema
+    Quando eu pedir a lista de todos os modelos
     Entao eu devo receber uma lista vazia

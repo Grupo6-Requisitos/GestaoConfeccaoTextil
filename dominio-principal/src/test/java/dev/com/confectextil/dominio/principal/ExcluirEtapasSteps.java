@@ -33,7 +33,7 @@ public class ExcluirEtapasSteps {
         repository.salvar(etapa);
     }
 
-    @Dado("que nao existe uma etapa cadastrada com ID {string}")
+    @Dado("que não existe uma etapa cadastrada com ID {string}")
     public void naoExisteEtapaCadastradaComId(String id){
         this.idEmContexto = id;
         Assertions.assertTrue(repository.buscarPorId(EtapaId.novo(id)).isEmpty());
