@@ -6,16 +6,16 @@ Funcionalidade: Excluir Etapa
   Para manter o fluxo de produção atualizado
 
   Regras Gerais:
-  - O ID da etapa deve ser único.
+  - O ID(identificador) da etapa deve ser único.
   - O Nome da etapa é obrigatório.
   - A Ordem deve ser um número inteiro positivo e único entre as etapas.
 
   Cenario: Excluir uma etapa existente
-    Dado que existe uma etapa cadastrada com ID "E001"
-    Quando eu solicitar a exclusao da etapa com ID "E001"
+    Dado que existe uma etapa cadastrada com identificador "E001"
+    Quando eu solicitar a exclusao da etapa com identificador "E001"
     Entao o sistema deve remover a etapa do cadastro
 
   Cenario: Tentar excluir uma etapa inexistente
-    Dado que não existe uma etapa cadastrada com ID "E999"
-    Quando eu solicitar a exclusao da etapa com ID "E999"
+    Dado que não existe uma etapa cadastrada com identificador "E999"
+    Quando eu solicitar a exclusao da etapa com identificador "E999"
     Entao o sistema deve informar "Etapa não encontrada para exclusão."

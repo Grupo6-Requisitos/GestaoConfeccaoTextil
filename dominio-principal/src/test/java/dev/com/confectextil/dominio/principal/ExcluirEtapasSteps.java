@@ -26,20 +26,20 @@ public class ExcluirEtapasSteps {
         mensagemRetorno = null;
     }
 
-    @Dado("que existe uma etapa cadastrada com ID {string}")
+    @Dado("que existe uma etapa cadastrada com identificador {string}")
     public void excluirUmaEtapaExistente(String id){
         this.idEmContexto = id;
         Etapa etapa = new Etapa(EtapaId.novo(id), "Corte", 1);
         repository.salvar(etapa);
     }
 
-    @Dado("que não existe uma etapa cadastrada com ID {string}")
+    @Dado("que não existe uma etapa cadastrada com identificador {string}")
     public void naoExisteEtapaCadastradaComId(String id){
         this.idEmContexto = id;
         Assertions.assertTrue(repository.buscarPorId(EtapaId.novo(id)).isEmpty());
     }
 
-    @Quando("eu solicitar a exclusao da etapa com ID {string}")
+    @Quando("eu solicitar a exclusao da etapa com identificador {string}")
     public void euSolicittarExclusao(String id){
         try {
             service.excluirEtapa(id);

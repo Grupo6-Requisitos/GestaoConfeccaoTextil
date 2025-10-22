@@ -13,7 +13,7 @@ public class ParceiroService {
     public void cadastrar(String id, String nome, String telefone){
         ParceiroId parceiroId = new ParceiroId(id);
         if (repositorio.buscarPorId(parceiroId).isPresent()) {
-            throw new IllegalArgumentException("Já existe um parceiro com o ID fornecido.");
+            throw new IllegalArgumentException("Já existe um parceiro com o identificador fornecido.");
         }
         Parceiro parceiro = new Parceiro(parceiroId, nome, telefone);
         repositorio.salvar(parceiro);

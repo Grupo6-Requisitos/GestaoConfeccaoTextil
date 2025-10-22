@@ -11,7 +11,7 @@ public class Parceiro {
 
     public Parceiro(ParceiroId id, String nome, String telefone){
         if (id==null) {
-            throw new IllegalArgumentException("Parceiro precisa de um ID válido");
+            throw new IllegalArgumentException("Parceiro precisa de um identificador válido");
         }
         this.id = id;
         alterarNome(nome);

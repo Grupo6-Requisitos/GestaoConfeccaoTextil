@@ -34,7 +34,7 @@ public class ParceiroStepDefinitions {
         telefoneEmContexto = null;
     }
     //Cadastrar
-    @Dado("que eu tenho um ID {string}, nome {string} e telefone {string}")
+    @Dado("que eu tenho um identificador {string}, nome {string} e telefone {string}")
     public void queEuTenhoUmIdNomeETelefone(String id, String nome, String telefone) {
         this.idEmContexto = id;
         this.nomeEmContexto = nome;
@@ -50,7 +50,7 @@ public class ParceiroStepDefinitions {
         }
     }
 
-    @Entao("o parceiro com ID {string} deve estar registrado no sistema")
+    @Entao("o parceiro com identificador {string} deve estar registrado no sistema")
     public void oParceiroComIdDeveEstarRegistradoNoSistema(String idEsperado) {
         assertTrue(repositorio.buscarPorId(new ParceiroId(idEsperado)).isPresent(), "Parceiro nao foi salvo no repositorio");
     }

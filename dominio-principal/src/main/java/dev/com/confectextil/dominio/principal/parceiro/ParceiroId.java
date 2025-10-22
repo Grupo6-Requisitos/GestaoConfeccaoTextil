@@ -7,7 +7,7 @@ public class ParceiroId {
 
     public ParceiroId(String id){
         if (id==null || id.trim().isEmpty()){
-            throw new IllegalArgumentException("O id não pode ser nulo ou vazio");
+            throw new IllegalArgumentException("O identificador não pode ser nulo ou vazio");
         }
         this.id = id;
     }
