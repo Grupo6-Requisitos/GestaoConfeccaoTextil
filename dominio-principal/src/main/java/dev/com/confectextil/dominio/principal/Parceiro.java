@@ -18,6 +18,12 @@ public class Parceiro {
         alterarTelefone(telefone);
     }
 
+    public Parceiro(String nome, String telefone){
+        this.id = new ParceiroId();
+        alterarNome(nome);
+        alterarTelefone(telefone);
+    }
+
     public ParceiroId getId(){
         return id;
     }

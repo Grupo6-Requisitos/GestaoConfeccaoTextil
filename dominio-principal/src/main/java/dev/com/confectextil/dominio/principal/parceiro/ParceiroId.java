@@ -12,6 +12,10 @@ public class ParceiroId {
         this.id = id;
     }
 
+    public ParceiroId(){
+        this(java.util.UUID.randomUUID().toString());
+    }
+
     public String getId(){
         return id;
     }
