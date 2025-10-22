@@ -16,17 +16,23 @@ public class Modelo {
     public Modelo(ModeloId id, String referencia, String nome, String imagemUrl, List<InsumoPadrao> insumosPadrao) {
         this.id = Objects.requireNonNull(id, "ID do Modelo não pode ser nulo.");
 
-        if (referencia == null || referencia.isBlank()) {
-            throw new IllegalArgumentException("A referência do modelo é obrigatória");
-        }
-        if (nome == null || nome.isBlank()) {
-            throw new IllegalArgumentException("O nome do modelo é obrigatório");
+        if (insumosPadrao == null || insumosPadrao.isEmpty()) {
+            throw new IllegalArgumentException("A lista de insumos padrão não pode ser nula ou vazia");
         }
 
-        this.referencia = referencia;
-        this.nome = nome;
-        this.imagemUrl = imagemUrl;
-        this.insumosPadrao = Objects.requireNonNull(insumosPadrao, "A lista de insumos padrão não pode ser nula.");
+        setReferencia(referencia);
+        setNome(nome);
+        setImagemUrl(imagemUrl);
+        setInsumosPadrao(insumosPadrao);
+    }
+
+    public Modelo(String referencia, String nome, String imagemUrl) {
+        this.id = new ModeloId();
+
+        setReferencia(referencia);
+        setNome(nome);
+        setImagemUrl(imagemUrl);
+        setInsumosPadrao(insumosPadrao);
     }
 
     public ModeloId getId() {
@@ -47,5 +53,27 @@ public class Modelo {
 
     public List<InsumoPadrao> getInsumosPadrao() {
         return List.copyOf(insumosPadrao);
+    }
+
+    public void setReferencia(String referencia) {
+        if (referencia == null || referencia.isBlank()) {
+            throw new IllegalArgumentException("A referência do modelo é obrigatória");
+        }
+        this.referencia = referencia;
+    }
+
+    public void setNome(String nome) {
+        if (nome == null || nome.isBlank()) {
+            throw new IllegalArgumentException("O nome do modelo é obrigatório");
+        }
+        this.nome = nome;
+    }
+
+    public void setImagemUrl(String imagemUrl) {
+        this.imagemUrl = imagemUrl;
+    }
+
+    public void setInsumosPadrao(List<InsumoPadrao> insumosPadrao) {
+        this.insumosPadrao = insumosPadrao;
     }
 }
