@@ -16,10 +16,6 @@ public class Modelo {
     public Modelo(ModeloId id, String referencia, String nome, String imagemUrl, List<InsumoPadrao> insumosPadrao) {
         this.id = Objects.requireNonNull(id, "ID do Modelo não pode ser nulo.");
 
-        if (insumosPadrao == null || insumosPadrao.isEmpty()) {
-            throw new IllegalArgumentException("A lista de insumos padrão não pode ser nula ou vazia");
-        }
-
         setReferencia(referencia);
         setNome(nome);
         setImagemUrl(imagemUrl);
