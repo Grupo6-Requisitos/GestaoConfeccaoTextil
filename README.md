@@ -12,7 +12,7 @@ O sistema atende dois contextos de negócio:
 - **B2B (Business to Business):** a ficha técnica é **vinculada a um pedido de cliente**, permitindo rastreabilidade completa até a entrega.  
 - **B2C (Business to Consumer):** a ficha técnica é **criada diretamente**, produzindo para estoque ou pronta-entrega.
 
-## 🧭 Descrição do Domínio Complero
+## 🧭 Descrição do Domínio Completo
 <a href="https://docs.google.com/document/d/1I92QvmoRz9IvBtjZ267P0aRUyF94VIwiQr15R9v5hwk/edit?usp=sharing" target="_blank">Docs Dominio</a>
 
 <details closed>
@@ -28,17 +28,15 @@ O sistema atende dois contextos de negócio:
 <details closed>
 <summary> ✏️ Protótipos de Baixa Fidelidade</summary>
 <br>
-Visualizar e Adicionar Modelo:
-<img width="1319" alt="protipo-baixa-visualizar-adicionar-modelo" src="https://github.com/user-attachments/assets/2976ef29-08c4-4de4-8fd6-2ed97841ed51" >
+Cadastrar Empresa:
+<img width="1319" alt="protipo-baixa-cadastrar-empresa" src="https://github.com/user-attachments/assets/f959cb07-f25d-4d10-80c8-0d1a6712a5d9" >
 <br>
-Editar Modelo:
-<img width="1319" alt="protipo-baixa-editar-modelo" src="https://github.com/user-attachments/assets/4e5f7e70-e059-4934-aa86-249437ca6716" >
+Editar Empresa:
+<img width="1319" alt="protipo-baixa-editar-empresa" src="https://github.com/user-attachments/assets/4f19c65d-6e89-4351-a8dc-768d86ea6651" >
 <br>
-Apagar Modelo:
-<img width="1319" alt="protipo-baixa-apagar-modelo" src="https://github.com/user-attachments/assets/cb40c6ea-c387-4727-864b-16ba5a47ab99" >
+Demais Funcionalidades:
+<a href="https://linnea.lovable.app/" target="_blank">Protótipos de Baixa Fidelidade</a>
 <br>
-Visualizar Modelo Específico:
-<img width="1319" alt="protipo-baixa-visualizar-especifico-modelo" src="https://github.com/user-attachments/assets/f2f3555c-439a-4fd4-9674-e52904cc5f6c" >
 </details>
 
 ## 👥 Integrantes do Grupo
