@@ -7,4 +7,8 @@ public record ModeloId(String valor) {
         }
         return new ModeloId(valor);
     }
+
+    public ModeloId() {
+        this(java.util.UUID.randomUUID().toString());
+    }
 }
