@@ -9,16 +9,10 @@ public class Etapa {
     private int ordem;
 
     public Etapa(EtapaId id, String nome, int ordem) {
-        validarNome(nome);
-        validarOrdem(ordem);
-
-        if (id == null) {
-            throw new IllegalArgumentException("ID da Etapa não pode ser nulo.");
-        }
 
         this.id = id;
-        this.nome = nome;
-        this.ordem = ordem;
+        setNome(nome);
+        setordem(ordem);
     }
 
 
@@ -43,6 +37,15 @@ public class Etapa {
         if (novaOrdem != null) {
             alterarOrdem(novaOrdem);
         }
+    }
+
+    public void setNome(String nome) {
+        validarNome(nome);
+        this.nome = nome;
+    }
+    public void setordem(int ordem) {
+        validarOrdem(ordem);
+        this.ordem = ordem;
     }
 
     public void alterarNome(String novoNome) {

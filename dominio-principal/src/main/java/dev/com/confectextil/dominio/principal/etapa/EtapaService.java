@@ -20,7 +20,7 @@ public class EtapaService {
         if (repository.buscarPorId(id).isPresent()) {
             throw new IllegalArgumentException("Etapa já cadastrada");
         }
-
+        
         Etapa etapa = new Etapa(id, nome, ordem);
         repository.salvar(etapa);
         return etapa;

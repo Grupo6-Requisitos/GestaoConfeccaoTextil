@@ -99,7 +99,7 @@ public class EtapaStepDefinitions {
   public void eu_cadastro_uma_nova_etapa_com_os_seguintes_dados(io.cucumber.datatable.DataTable dataTable) {
     Map<String, String> dados = dataTable.asMaps(String.class, String.class).get(0); 
     String id = dados.get("id");
-    String nome = obterNomeEtapa(dados); // <--- CORREÇÃO APLICADA
+    String nome = obterNomeEtapa(dados);
     int ordem = Integer.parseInt(dados.get("ordem"));
     
     try {

@@ -5,8 +5,7 @@ import java.util.Objects; // Importar java.util.Objects para simplificar equals/
 public class EtapaId {
     private final String valor;
 
-    private EtapaId(String valor) {
-        // ... Suas validações de ID alfanumérico ...
+    public EtapaId(String valor) {
         this.valor = valor;
     }
 
