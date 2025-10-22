@@ -7,4 +7,8 @@ public record InsumoId(String valor) {
         }
         return new InsumoId(valor);
     }
+
+    public InsumoId() {
+        this(java.util.UUID.randomUUID().toString());
+    }
 }

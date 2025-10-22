@@ -13,10 +13,14 @@ public class Insumo {
 
     public Insumo(InsumoId id, String referencia, String nome, String unidade, double quantidadeEmEstoque) {
         this.id = Objects.requireNonNull(id, "ID do Insumo não pode ser nulo.");
-        this.referencia = Objects.requireNonNull(referencia, "Referência do Insumo é obrigatória.");
-        this.nome = Objects.requireNonNull(nome, "Nome do Insumo é obrigatório.");
-        this.unidade = Objects.requireNonNull(unidade, "Unidade do Insumo é obrigatória.");
-        this.quantidadeEmEstoque = quantidadeEmEstoque;
+        setReferencia(referencia);
+        setNome(nome);
+        setUnidade(unidade);
+        setQuantidadeEmEstoque(quantidadeEmEstoque);
+    }
+
+    public Insumo(String referencia, String nome, String unidade) {
+        this(new InsumoId(), referencia, nome, unidade, 0);
     }
 
     public InsumoId getId() {
@@ -37,5 +41,34 @@ public class Insumo {
 
     public double getQuantidadeEmEstoque() {
         return quantidadeEmEstoque;
+    }
+
+    public void setReferencia(String referencia) {
+        this.referencia = Objects.requireNonNull(referencia, "Referência do Insumo é obrigatória.");
+    }
+
+    public void setNome(String nome) {
+        this.nome = Objects.requireNonNull(nome, "Nome do Insumo é obrigatório.");
+    }
+
+    public void setUnidade(String unidade) {
+        this.unidade = Objects.requireNonNull(unidade, "Unidade do Insumo é obrigatória.");
+    }
+
+    public void setQuantidadeEmEstoque(double quantidadeEmEstoque) {
+        this.quantidadeEmEstoque = quantidadeEmEstoque;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Insumo insumo = (Insumo) o;
+        return id.equals(insumo.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
