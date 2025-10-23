@@ -50,6 +50,57 @@ public class ModeloService {
         return novoModelo;
     }
 
+    public void removerModeloPorReferencia(String referencia) {
+        if (referencia == null || referencia.isBlank()) {
+            throw new IllegalArgumentException("Referência alvo não informada");
+        }
+
+        Modelo modelo = modeloRepository.buscarPorReferencia(referencia)
+            .orElseThrow(() -> new IllegalStateException("O modelo com referência " + referencia + " não foi encontrado"));
+
+        modeloRepository.removerPorReferencia(modelo.getReferencia());
+    }
+
+    public Modelo atualizarModelo(String referenciaAlvo, String novaReferencia, String novoNome) {
+        if (referenciaAlvo == null || referenciaAlvo.isBlank()) {
+            throw new IllegalArgumentException("Referência alvo não informada");
+        }
+
+        Modelo existente = modeloRepository.buscarPorReferencia(referenciaAlvo)
+            .orElseThrow(() -> new IllegalStateException("O modelo com referência " + referenciaAlvo + " não foi encontrado"));
+
+        String referenciaFinal = existente.getReferencia();
+        if (novaReferencia != null) {
+            if (novaReferencia.isBlank()) {
+                throw new IllegalArgumentException("A nova referência é obrigatória");
+            }
+            if (!novaReferencia.equals(referenciaFinal) && modeloRepository.buscarPorReferencia(novaReferencia).isPresent()) {
+                throw new IllegalStateException("Já existe um modelo com a referência " + novaReferencia);
+            }
+            referenciaFinal = novaReferencia;
+        }
+
+        String nomeFinal = existente.getNome();
+        if (novoNome != null) {
+            if (novoNome.isBlank()) {
+                throw new IllegalArgumentException("O nome do modelo é obrigatório");
+            }
+            nomeFinal = novoNome;
+        }
+
+        Modelo atualizado = new Modelo(
+            existente.getId(),
+            referenciaFinal,
+            nomeFinal,
+            existente.getImagemUrl(),
+            existente.getInsumosPadrao()
+        );
+
+        modeloRepository.atualizar(referenciaAlvo, atualizado);
+
+        return atualizado;
+    }
+
     public List<Modelo> listarTodos() {
         return modeloRepository.listarTodos();
     }

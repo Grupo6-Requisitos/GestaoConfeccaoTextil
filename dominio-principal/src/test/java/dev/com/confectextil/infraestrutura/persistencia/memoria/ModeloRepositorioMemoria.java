@@ -33,6 +33,12 @@ public class ModeloRepositorioMemoria implements ModeloRepository {
         armazenamento.remove(referencia);
     }
 
+    @Override
+    public void atualizar(String referenciaOriginal, Modelo modeloAtualizado) {
+        armazenamento.remove(referenciaOriginal);
+        armazenamento.put(modeloAtualizado.getReferencia(), modeloAtualizado);
+    }
+
     public void limpar() {
         armazenamento.clear();
     }

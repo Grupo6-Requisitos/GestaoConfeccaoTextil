@@ -28,7 +28,7 @@ public class Modelo {
         setReferencia(referencia);
         setNome(nome);
         setImagemUrl(imagemUrl);
-        setInsumosPadrao(insumosPadrao);
+        setInsumosPadrao(List.of());
     }
 
     public ModeloId getId() {
@@ -70,6 +70,7 @@ public class Modelo {
     }
 
     public void setInsumosPadrao(List<InsumoPadrao> insumosPadrao) {
-        this.insumosPadrao = insumosPadrao;
+        List<InsumoPadrao> listaNormalizada = insumosPadrao == null ? List.of() : List.copyOf(insumosPadrao);
+        this.insumosPadrao = listaNormalizada;
     }
 }

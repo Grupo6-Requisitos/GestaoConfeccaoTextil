@@ -10,4 +10,5 @@ public interface ModeloRepository {
     Optional<Modelo> buscarPorReferencia(String referencia);
     List<Modelo> listarTodos();
     void removerPorReferencia(String referencia);
+    void atualizar(String referenciaOriginal, Modelo modeloAtualizado);
 }
