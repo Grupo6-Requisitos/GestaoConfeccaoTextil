@@ -10,26 +10,20 @@ public class Fabrico {
     private String cnpj;
 
     public Fabrico(FabricoId id, String nomeFantasia, String cnpj) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID do Fabrico não pode ser nulo.");
-        }
-
-        if (nomeFantasia == null || nomeFantasia.isBlank()) {
-            throw new IllegalArgumentException("O nome fantasia do Fabrico é obrigatório.");
-        }
-
-        if (cnpj == null || cnpj.isBlank()) {
-            throw new IllegalArgumentException("O CNPJ do Fabrico é obrigatório.");
-        }
-
-        if (!cnpj.matches("\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}")) {
-            throw new IllegalArgumentException("CNPJ inválido");
-        }
-
-        this.id = id;
-        this.nomeFantasia = nomeFantasia;
-        this.cnpj = cnpj;
+        this.id = Objects.requireNonNull(id, "ID do Fabrico não pode ser nulo.");
+        
+        setNomeFantasia(nomeFantasia);
+        setCnpj(cnpj);
     }
+
+
+    public Fabrico(String nomeFantasia, String cnpj) {
+        this.id = new FabricoId();
+        
+        setNomeFantasia(nomeFantasia);
+        setCnpj(cnpj);
+    }
+
 
     public FabricoId getId() { 
         return id; 

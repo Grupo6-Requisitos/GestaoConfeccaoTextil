@@ -32,13 +32,13 @@ public class FabricoStepDefinitions {
         System.out.println("Sistema inicializado para o ano: " + ano);
     }
 
-    @Dado("que não existe um Fabrico com id {string}")
+    @Dado("que não existe um Fabrico identificado como {string}")
     public void que_nao_existe_um_fabrico_com_id(String fabricoId) {
         assertFalse(fabricoService.existe(fabricoId), 
             "O Fabrico com ID " + fabricoId + " não deveria existir");
     }
 
-    @Dado("que já existe um Fabrico cadastrado com id {string}")
+    @Dado("que já existe um Fabrico cadastrado identificado como {string}")
     public void que_ja_existe_um_fabrico_cadastrado_com_id(String fabricoId) {
         fabricoService.cadastrarFabrico(
             fabricoId, 
@@ -79,7 +79,7 @@ public class FabricoStepDefinitions {
         }
     }
 
-    @Quando("eu tento cadastrar outro Fabrico com id {string}")
+    @Quando("eu tento cadastrar outro Fabrico identificado como {string}")
     public void eu_tento_cadastrar_outro_fabrico_com_id(String fabricoId) {
         try {
             fabricoService.cadastrarFabrico(

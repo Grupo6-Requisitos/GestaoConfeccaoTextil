@@ -13,7 +13,7 @@ Funcionalidade: 1 - Cadastro e Edição de Fabrico
     Dado que o sistema está ativo no ano de 2025
 
   Cenário: Cadastrar Fabrico com sucesso
-    Dado que não existe um Fabrico com id "F-001"
+    Dado que não existe um Fabrico identificado como "F-001"
     Quando eu cadastro um novo Fabrico com os seguintes dados:
       | fabricoId     | F-001              |
       | nomeFantasia  | Têxtil Brasil      |
@@ -22,7 +22,7 @@ Funcionalidade: 1 - Cadastro e Edição de Fabrico
     E o CNPJ deve ser "12.345.678/0001-90"
 
   Cenário: Falha ao cadastrar Fabrico com CNPJ inválido
-    Dado que não existe um Fabrico com id "F-002"
+    Dado que não existe um Fabrico identificado como "F-002"
     Quando eu cadastro um novo Fabrico com os seguintes dados:
       | fabricoId     | F-002           |
       | nomeFantasia  | Fios do Norte   |
@@ -30,8 +30,8 @@ Funcionalidade: 1 - Cadastro e Edição de Fabrico
     Então o sistema deve rejeitar o cadastro por CNPJ inválido
 
   Cenário: Falha ao cadastrar Fabrico com ID duplicado
-    Dado que já existe um Fabrico cadastrado com id "F-003"
-    Quando eu tento cadastrar outro Fabrico com id "F-003"
+    Dado que já existe um Fabrico cadastrado identificado como "F-003"
+    Quando eu tento cadastrar outro Fabrico identificado como "F-003"
     Então o sistema deve rejeitar o cadastro
     E exibir a mensagem de erro "Fabrico já cadastrado"
 
@@ -49,7 +49,7 @@ Funcionalidade: 1 - Cadastro e Edição de Fabrico
     E o CNPJ deve permanecer "22.333.444/0001-10"
 
   Cenário: Falha ao editar Fabrico inexistente
-    Dado que não existe um Fabrico com id "F-999"
+    Dado que não existe um Fabrico identificado como "F-999"
     Quando eu tento editar o Fabrico "F-999" alterando:
       | nomeFantasia | Nova Fábrica XYZ |
     Então o sistema deve exibir a mensagem de erro "Fabrico não encontrado"
