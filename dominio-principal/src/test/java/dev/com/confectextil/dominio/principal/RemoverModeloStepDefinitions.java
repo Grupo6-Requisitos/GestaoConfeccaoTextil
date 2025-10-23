@@ -1,6 +1,5 @@
 package dev.com.confectextil.dominio.principal;
 
-import dev.com.confectextil.dominio.principal.Modelo;
 import dev.com.confectextil.dominio.principal.modelo.ModeloService;
 import dev.com.confectextil.infraestrutura.persistencia.memoria.InsumoRepositorioMemoria;
 import dev.com.confectextil.infraestrutura.persistencia.memoria.ModeloRepositorioMemoria;

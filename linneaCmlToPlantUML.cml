@@ -1,0 +1,253 @@
+@startuml
+' Fabrica de Confeccao - Aggregates overview
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+' opcional: layout left to right
+left to right direction
+
+package "GestaoDeProducao" {
+  package "FichaTecnica (Aggregate)" {
+    class FichaTecnica <<AggregateRoot>> {
+      +FichaTecnicaId id
+      +ModeloId modeloId
+      +PedidoId pedidoId
+      +Grade grade
+      +StatusFichaTecnica statusGeral
+      +Date dataCriacao
+      +String referencia
+    }
+    class Grade <<Entity>> {
+      +GradeId id
+      +List<ItemDaGrade> itens
+      +int quantidadeTotal
+    }
+    class ItemDaGrade <<ValueObject>> {
+      +String cor
+      +String tamanho
+      +int quantidade
+    }
+    interface FichaTecnicaRepository <<Repository>> {
+      +salvar(f: FichaTecnica)
+      +buscarPorId(id: FichaTecnicaId)
+      +listarPorStatus(s: StatusFichaTecnica)
+      +listarPorPedido(p: PedidoId)
+    }
+    enum StatusFichaTecnica {
+      A_FAZER
+      EM_PRODUCAO
+      CONCLUIDO
+    }
+  }
+
+  package "Movimentacao (Aggregate)" {
+    class Movimentacao <<AggregateRoot>> {
+      +MovimentacaoId id
+      +FichaTecnicaId fichaTecnicaId
+      +EtapaId etapaId
+      +StatusMovimentacao status
+      +Date dataInicio
+      +Date dataFim
+    }
+    class Operacao <<Entity>> {
+      +OperacaoId id
+      +MovimentacaoId movimentacaoId
+      +ParceiroId parceiroId
+      +String nome
+      +Grade gradeEnviada
+      +StatusOperacao status
+      +float custoDaOperacao
+    }
+    class RegistroDeRetorno <<Entity>> {
+      +RegistroDeRetornoId id
+      +OperacaoId operacaoId
+      +Date dataRetorno
+      +Grade gradeDeRetorno
+      +String observacoes
+    }
+    interface MovimentacaoRepository <<Repository>> {
+      +salvar(m: Movimentacao)
+      +buscarPorId(id: MovimentacaoId)
+      +buscarAtivaPorFichaTecnica(f: FichaTecnicaId)
+      +listarPorFichaTecnica(f: FichaTecnicaId)
+    }
+    interface ProducaoServico <<Service>> {
+      +iniciarNovaMovimentacao(f: FichaTecnicaId, e: EtapaId)
+      +dividirOperacao(m: MovimentacaoId, distribuicao: Map<ParceiroId, Grade>)
+      +registrarRetorno(o: OperacaoId, g: Grade, obs: String)
+    }
+    enum StatusMovimentacao {
+      EM_ANDAMENTO
+      CONCLUIDO
+    }
+    enum StatusOperacao {
+      ENVIADO
+      RETORNANDO
+      CONCLUIDO
+    }
+  }
+
+  package "Etapa (Aggregate)" {
+    class Etapa <<AggregateRoot>> {
+      +EtapaId id
+      +String nome
+      +int ordem
+    }
+    interface EtapaRepository <<Repository>> {
+      +salvar(e: Etapa)
+      +buscarPorId(id: EtapaId)
+      +listarOrdenadoPorOrdem()
+    }
+  }
+
+  package "Parceiro (Aggregate)" {
+    class Parceiro <<AggregateRoot>> {
+      +ParceiroId id
+      +String nome
+      +String telefone
+    }
+    interface ParceiroRepository <<Repository>> {
+      +salvar(p: Parceiro)
+      +buscarPorId(id: ParceiroId)
+      +listarTodos()
+    }
+  }
+
+  package "ListaDeTamanhos (Aggregate)" {
+    class ListaDeTamanhos <<AggregateRoot>> {
+      +ListaDeTamanhosId id
+      +String nome
+      +List<String> tamanhos
+    }
+    interface ListaDeTamanhosRepository <<Repository>> {
+      +salvar(l: ListaDeTamanhos)
+      +buscarPorId(id: ListaDeTamanhosId)
+      +listarTodos()
+    }
+  }
+}
+
+package "CatalogoDeProdutos" {
+  package "Modelo (Aggregate)" {
+    class Modelo <<AggregateRoot>> {
+      +ModeloId id
+      +String referenciaInterna
+      +String nome
+      +String imagemUrl
+    }
+    interface ModeloRepository <<Repository>> {
+      +salvar(m: Modelo)
+      +buscarPorId(id: ModeloId)
+      +buscarPorReferencia(ref: String)
+      +listarTodos()
+    }
+  }
+
+  package "Insumo (Aggregate)" {
+    class Insumo <<AggregateRoot>> {
+      +InsumoId id
+      +String nome
+      +String unidadeDeMedida
+      +float custoUnitario
+    }
+    interface InsumoRepository <<Repository>> {
+      +salvar(i: Insumo)
+      +buscarPorId(id: InsumoId)
+      +listarTodos()
+    }
+  }
+}
+
+package "GestaoComercial" {
+  package "Cliente (Aggregate)" {
+    class Cliente <<AggregateRoot>> {
+      +ClienteId id
+      +String nome
+      +String telefone
+      +String email
+    }
+    interface ClienteRepository <<Repository>> {
+      +salvar(c: Cliente)
+      +buscarPorId(id: ClienteId)
+      +listarTodos()
+    }
+  }
+
+  package "Pedido (Aggregate)" {
+    class Pedido <<AggregateRoot>> {
+      +PedidoId id
+      +ClienteId clienteId
+      +Date dataPedido
+      +Date dataEntregaPrevista
+      +Date dataEntregaRealizada
+      +StatusPedido status
+      +List<ItemDePedido> itens
+    }
+    class ItemDePedido <<Entity>> {
+      +ItemDePedidoId id
+      +ModeloId modeloId
+      +Grade gradeSolicitada
+    }
+    enum StatusPedido {
+      RECEBIDO
+      EM_PRODUCAO
+      ENTREGUE
+      CANCELADO
+    }
+    interface PedidoRepository <<Repository>> {
+      +salvar(p: Pedido)
+      +buscarPorId(id: PedidoId)
+      +listarPorCliente(c: ClienteId)
+      +listarPorStatus(s: StatusPedido)
+    }
+  }
+}
+
+package "AdministracaoDoFabrico" {
+  package "Fabrico (Aggregate)" {
+    class Fabrico <<AggregateRoot>> {
+      +FabricoId id
+      +String nomeFantasia
+      +String cnpj
+    }
+    interface FabricoRepository <<Repository>> {
+      +salvar(f: Fabrico)
+      +editar(f: Fabrico)
+      +buscarPorId(id: FabricoId)
+    }
+  }
+
+  package "Usuario (Aggregate)" {
+    class Usuario <<AggregateRoot>> {
+      +UsuarioId id
+      +String nome
+      +Email email
+      +String senhaHash
+      +FabricoId fabricoId
+      +PerfilUsuario perfil
+    }
+    class Email <<ValueObject>> {
+      +String endereco
+    }
+    enum PerfilUsuario {
+      GESTOR
+      OPERACIONAL
+    }
+    interface UsuarioRepository <<Repository>> {
+      +salvar(u: Usuario)
+      +buscarPorId(id: UsuarioId)
+      +buscarPorEmail(e: Email)
+    }
+  }
+}
+
+' --- Associations (exemplos de links)
+FichaTecnica "1" o-- "1" Grade : contem
+FichaTecnica --> Modelo : referencia
+FichaTecnica --> Pedido : pertence_a
+Pedido --> Cliente : feito_por
+Movimentacao --> FichaTecnica : referente_a
+Operacao --> Movimentacao : pertence_a
+Operacao --> Parceiro : executado_por
+Usuario --> Fabrico : pertence_a
+@enduml
