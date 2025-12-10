@@ -1,41 +1,34 @@
-/* TEM QUE TROCAR
-package dev.sauloaraujo.sgb;
+
+package dev.com.linnea;
 
 import static org.springframework.boot.SpringApplication.run;
 
 import java.io.IOException;
 
+import dev.com.linnea.aplicacao.principal.modelo.ModeloRepositorioAplicacao;
+import dev.com.linnea.aplicacao.principal.modelo.ModeloServicoAplicacao;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.modelmapper.ModelMapper;
 
-import dev.sauloaraujo.dominio.analise.emprestimo.EmprestimoRegistroRepositorio;
-import dev.sauloaraujo.sgb.aplicacao.acervo.autor.AutorRepositorioAplicacao;
-import dev.sauloaraujo.sgb.aplicacao.acervo.autor.AutorServicoAplicacao;
-import dev.sauloaraujo.sgb.aplicacao.acervo.exemplar.ExemplarRepositorioAplicacao;
-import dev.sauloaraujo.sgb.aplicacao.acervo.exemplar.ExemplarServicoAplicacao;
-import dev.sauloaraujo.sgb.aplicacao.acervo.livro.LivroRepositorioAplicacao;
-import dev.sauloaraujo.sgb.aplicacao.acervo.livro.LivroServicoAplicacao;
-import dev.sauloaraujo.sgb.aplicacao.analise.EmprestimoRegistroRepositorioAplicacao;
-import dev.sauloaraujo.sgb.aplicacao.analise.EmprestimoRegistroServicoAplicacao;
-import dev.sauloaraujo.sgb.dominio.acervo.autor.AutorRepositorio;
-import dev.sauloaraujo.sgb.dominio.acervo.autor.AutorServico;
-import dev.sauloaraujo.sgb.dominio.acervo.exemplar.EmprestimoServico;
-import dev.sauloaraujo.sgb.dominio.acervo.exemplar.ExemplarRepositorio;
-import dev.sauloaraujo.sgb.dominio.acervo.exemplar.ExemplarServico;
-import dev.sauloaraujo.sgb.dominio.acervo.livro.LivroRepositorio;
-import dev.sauloaraujo.sgb.dominio.acervo.livro.LivroServico;
-import dev.sauloaraujo.sgb.dominio.evento.EventoBarramento;
 
 @SpringBootApplication
 public class AplicacaoBackend {
+
 	@Bean
-	public AutorServico autorServico(AutorRepositorio repositorio) {
-		return new AutorServico(repositorio);
+	public ModeloServicoAplicacao modeloServicoAplicacao(ModeloRepositorioAplicacao repositorio) {
+		return new ModeloServicoAplicacao(repositorio);
 	}
 
 	@Bean
-	public AutorServicoAplicacao autorServicoAplicacao(AutorRepositorioAplicacao repositorio) {
-		return new AutorServicoAplicacao(repositorio);
+	public ModelMapper modelMapper() {
+		return new ModelMapper();
+	}
+	
+	/* TEM QUE TROCAR
+	@Bean
+	public AutorServico autorServico(AutorRepositorio repositorio) {
+		return new AutorServico(repositorio);
 	}
 
 	@Bean
@@ -69,8 +62,10 @@ public class AplicacaoBackend {
 			EventoBarramento servico) {
 		return new EmprestimoRegistroServicoAplicacao(repositorio, repositorioAplicacao, servico);
 	}
+*/
 
 	public static void main(String[] args) throws IOException {
 		run(AplicacaoBackend.class, args);
 	}
-}*/
+
+}

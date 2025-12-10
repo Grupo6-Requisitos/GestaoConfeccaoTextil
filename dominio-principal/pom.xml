@@ -5,9 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>br.edu.cesar.projetorequisitos</groupId>
-        <artifactId>GestaoConfeccaoTextil</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <groupId>dev.com.linnea</groupId>
+        <artifactId>linnea-pai</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pai</relativePath>
     </parent>
 
     <artifactId>dominio-principal</artifactId>
@@ -24,7 +25,6 @@
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
-            <version>1.7</version>
         </dependency>
 
         <!-- test (JUnit 5 + Cucumber) -->

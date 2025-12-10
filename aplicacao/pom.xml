@@ -16,7 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>linnea-dominio-principal</artifactId>
+			<artifactId>dominio-principal</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
