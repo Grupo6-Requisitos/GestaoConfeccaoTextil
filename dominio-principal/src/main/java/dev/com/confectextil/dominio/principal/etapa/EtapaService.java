@@ -79,6 +79,6 @@ public class EtapaService {
         EtapaId id = EtapaId.novo(etapaId);
         Etapa etapa = repository.buscarPorId(id)
                 .orElseThrow(() -> new IllegalArgumentException("Etapa não encontrada para exclusão."));
-        repository.excluir(id);
+        repository.excluir(etapa.getId());
     }
 }
