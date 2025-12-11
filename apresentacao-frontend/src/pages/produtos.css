@@ -1,0 +1,484 @@
+/* Outfit global */
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap");
+
+:root {
+  --primary-blue: #a9e2f2;
+  --accent-green: #d7fe65;
+  --muted: #898c8f;
+  --muted-dark: #404040;
+  --footer-blue: #4696ad;
+
+  --sidebar-width: 260px;
+  --card-height: 320px;
+  --control-height: 44px;
+  --grid-gap: 28px;
+
+  /* ===== COLORS YOU CAN TWEAK =====
+     If you want to change the gray strip color or the text color inside it,
+     change the variables below.
+     - --card-bottom-bg: background color of the bottom strip that contains "type" and "Criado em"
+     - --card-bottom-text: text color used inside that strip
+  */
+  --card-bottom-bg: #f3f4fa; /* <-- change this to alter the gray color of the bottom strip */
+  --card-bottom-text: #8a8c8f; /* <-- change this to alter the text color inside the bottom strip */
+  /* ================================= */
+
+  --container-radius: 24px; /* adjust to make the main container more or less 'abaulado' */
+}
+
+* {
+  box-sizing: border-box;
+}
+body,
+html,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+/* Apply Outfit globally */
+body {
+  font-family: "Outfit", system-ui, -apple-system, "Segoe UI", Roboto, Arial,
+    sans-serif;
+  color: #111;
+}
+
+/* Shell basics */
+/* .app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #ffffff 0%, var(--primary-blue) 100%);
+  position: relative;
+} */
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr; /* coluna fixa do sidebar + conteúdo flex */
+  grid-template-rows: auto 1fr; /* header dentro da coluna direita será gerenciado lá */
+  gap: 0;
+  background: linear-gradient(180deg, #ffffff 0%, var(--primary-blue) 100%);
+  position: relative;
+}
+
+/* Header */
+.header {
+  height: 128px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  background: transparent;
+  z-index: 5;
+}
+
+/* shell-body */
+/* .shell-body {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 20px 28px 28px 28px;
+  position: relative;
+  padding-left: calc(var(--sidebar-width) + 48px);
+} */
+
+.shell-body {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 20px 28px 28px 28px;
+  position: relative;
+  /* REMOVA a linha abaixo se existir:
+     padding-left: calc(var(--sidebar-width) + 48px);
+  */
+}
+
+/* .sidebar {
+  width: var(--sidebar-width);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: transparent;
+  box-sizing: border-box;
+  position: absolute;
+  top: -8px; /* moved a bit more up so logo sits even closer to the top; adjust this if you want it further up/down */
+/* left: 28px; */
+/* z-index: 50; above header  */
+/* } */
+.sidebar {
+  width: var(--sidebar-width);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: transparent;
+  box-sizing: border-box;
+  /* REMOVIDO: position:absolute / top / left / z-index */
+  /* O sidebar agora ocupa naturalmente a coluna esquerda do grid e começa no topo */
+}
+
+.logo-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px 0;
+}
+.sidebar-logo {
+  height: 52px;
+  object-fit: contain;
+}
+
+/* rest of sidebar styles (unchanged) */
+.sidebar-top {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+  margin-top: 8px;
+}
+.btn-new-order {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #a9e2f2;
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: none;
+  justify-content: flex-start;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+.btn-text {
+  margin-left: 6px;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+}
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 700;
+  width: 100%;
+  font-size: 16px;
+  justify-content: flex-start;
+}
+.menu-item svg {
+  color: inherit;
+}
+.menu-item.active {
+  background: var(--accent-green);
+  color: var(--muted-dark);
+  border-radius: 12px;
+}
+
+/* Main area */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 72px - 120px);
+}
+
+/* Page container: more rounded (abaulado) using --container-radius */
+.content-container {
+  background: #fff;
+  border-radius: var(--container-radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08); /* slightly stronger shadow to accentuate abaulamento */
+}
+
+/* Header row inside page */
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* >>> ADICIONAR (ou substituir se já existir) para controlar a coluna direita */
+.content-column {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 12px 28px; /* ajuste conforme seu gosto */
+  gap: 0;
+}
+
+/* Header dentro da coluna direita (mantém-se no topo) */
+.content-column .header {
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  background: transparent;
+}
+
+/* Title: using external svg asset now */
+.title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #404040;
+}
+.title-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+.title-wrap h1 {
+  font-size: 30px;
+  margin: 0;
+  font-weight: 120;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Search box (single element) */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
+  padding: 6px 8px;
+  min-width: 320px;
+  background: white;
+  overflow: hidden;
+  height: var(--control-height);
+}
+.search-box__input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 15px;
+  padding: 6px 8px;
+  font-family: inherit;
+}
+.search-box__input::placeholder {
+  color: #bdbdbd;
+  font-family: inherit;
+}
+.search-box__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  padding: 6px;
+  cursor: pointer;
+}
+
+/* Custom select trigger (matching height) */
+.custom-select {
+  position: relative;
+  min-width: 200px;
+  font-weight: 700;
+}
+.custom-select__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
+  background: white;
+  cursor: pointer;
+  font-size: 15px;
+  height: var(--control-height);
+  font-family: inherit;
+}
+.custom-select__value {
+  color: #404040;
+  font-family: inherit;
+}
+
+/* dropdown list (rounded) */
+.custom-select__list {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  padding: 8px;
+  list-style: none;
+  margin: 0;
+  z-index: 60;
+  max-height: 240px;
+  overflow: auto;
+  display: none;
+}
+.custom-select.open .custom-select__list {
+  display: block;
+}
+
+/* items: selected shows only the vertical bar on the left, no background or caret */
+.custom-select__item {
+  padding: 8px 10px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--muted-dark);
+}
+.custom-select__item + .custom-select__item {
+  margin-top: 6px;
+}
+.custom-select__item.selected {
+  background: transparent;
+  color: var(--muted-dark);
+  position: relative;
+}
+.custom-select__item.selected::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  width: 6px;
+  height: 36px;
+  border-radius: 6px;
+  background: var(--accent-green);
+}
+
+/* Grid products: increased gap and spacing */
+.grid-products {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--grid-gap);
+  margin-top: 16px;
+}
+
+/* Product card: subtle blue bottom gradient overlay and pure gray bottom strip */
+.product-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: var(--card-height);
+  position: relative;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+.card-media {
+  flex: 1;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  height: 100%;
+}
+
+/* Name: larger font and moved lower */
+.card-name {
+  position: absolute;
+  left: 16px;
+  bottom: 74px; /* moved name lower */
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #ffffff;
+  font-weight: 129;
+  font-size: 18px; /* increased font size for model name */
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+.card-name__text {
+  display: inline-block;
+}
+
+/* bottom area: USE CSS VARIABLES for easy customization */
+.card-meta {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  /* gap: 6px; */
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  background: var(
+    --card-bottom-bg
+  ); /* <-- change this variable in :root to alter the gray color */
+  color: var(
+    --card-bottom-text
+  ); /* <-- change this variable in :root to alter the text color */
+}
+.card-meta .type {
+  font-size: 10px;
+}
+.card-meta .created {
+  font-size: 10px;
+}
+
+/* Footer */
+.app-footer {
+  margin-top: 18px;
+  padding: 18px;
+  display: flex;
+  justify-content: center;
+}
+.footer-text {
+  font-family: "Outfit", sans-serif;
+  color: var(--footer-blue);
+  font-weight: 600;
+}
+
+/* responsive */
+@media (max-width: 1200px) {
+  .grid-products {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 900px) {
+  .grid-products {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .sidebar {
+    display: none;
+  }
+  .shell-body {
+    padding-left: 28px;
+  }
+}
+@media (max-width: 480px) {
+  .grid-products {
+    grid-template-columns: repeat(1, 1fr);
+  }
+  .header {
+    padding: 0 12px;
+  }
+  .shell-body {
+    padding: 12px;
+    flex-direction: column;
+    gap: 12px;
+    padding-left: 12px;
+  }
+
+  .sidebar {
+    display: none;
+  }
+}
