@@ -4,9 +4,13 @@ package dev.com.linnea;
 import static org.springframework.boot.SpringApplication.run;
 
 import java.io.IOException;
+import java.util.List;
 
 import dev.com.confectextil.dominio.principal.etapa.EtapaRepository;
 import dev.com.confectextil.dominio.principal.etapa.EtapaService;
+import dev.com.confectextil.dominio.principal.etapa.EtapaStrategy;
+import dev.com.confectextil.dominio.principal.etapa.strategy.EtapaProducaoStrategy;
+import dev.com.confectextil.dominio.principal.etapa.strategy.EtapaQualidadeStrategy;
 import dev.com.linnea.aplicacao.principal.modelo.ModeloRepositorioAplicacao;
 import dev.com.linnea.aplicacao.principal.modelo.ModeloServicoAplicacao;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -27,9 +31,13 @@ public class AplicacaoBackend {
 		return new ModelMapper();
 	}
 
-	  @Bean
+	   @Bean
     public EtapaService etapaService(EtapaRepository etapaRepository) {
-        return new EtapaService(etapaRepository);
+        List<EtapaStrategy> estrategias = List.of(
+            new EtapaProducaoStrategy(),
+            new EtapaQualidadeStrategy()
+        );
+        return new EtapaService(etapaRepository, estrategias);
     }
 	
 	/* TEM QUE TROCAR

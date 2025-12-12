@@ -19,57 +19,68 @@ public class EtapaController {
         this.etapaService = etapaService;
     }
 
-    // ---------- Criar nova etapa ----------
+    // Criar etapa
     @PostMapping
-    public ResponseEntity<Etapa> criarEtapa(@RequestBody EtapaDTO dto) {
-        Etapa etapa = etapaService.cadastrarEtapa(dto.getId(), dto.getNome(), dto.getOrdem());
-        return new ResponseEntity<>(etapa, HttpStatus.CREATED);
+    public ResponseEntity<EtapaDTO> criarEtapa(@RequestBody EtapaDTO dto) {
+        Etapa etapa = etapaService.cadastrarEtapa(
+                dto.getId(), 
+                dto.getNome(), 
+                dto.getOrdem(), 
+                dto.getTipo()
+        );
+
+        return new ResponseEntity<>(toDTO(etapa, dto.getTipo()), HttpStatus.CREATED);
     }
 
-    // ---------- Editar etapa ----------
+    // Editar etapa
     @PutMapping("/{id}")
-    public ResponseEntity<Etapa> editarEtapa(@PathVariable String id, @RequestBody EtapaDTO dto) {
+    public ResponseEntity<EtapaDTO> editarEtapa(@PathVariable String id, @RequestBody EtapaDTO dto) {
         Etapa etapa = etapaService.editarEtapa(id, dto.getNome(), dto.getOrdem());
-        return ResponseEntity.ok(etapa);
+        return ResponseEntity.ok(toDTO(etapa, dto.getTipo()));
     }
 
-    // ---------- Buscar etapa por ID ----------
+    // Buscar por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Etapa> buscarPorId(@PathVariable String id) {
+    public ResponseEntity<EtapaDTO> buscarPorId(@PathVariable String id) {
         Etapa etapa = etapaService.buscarPorId(id);
-        if (etapa == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(etapa);
+        if (etapa == null) return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(toDTO(etapa, null));
     }
 
-    // ---------- Listar todas as etapas ----------
+    // Listar todas
     @GetMapping
     public ResponseEntity<List<EtapaDTO>> listarTodas() {
-        List<EtapaDTO> etapas = etapaService.listarTodos().stream()
-                .map(e -> {
-                    EtapaDTO dto = new EtapaDTO();
-                    dto.setId(e.getId().getValor());
-                    dto.setNome(e.getNome());
-                    dto.setOrdem(e.getOrdem());
-                    return dto;
-                })
+        List<EtapaDTO> lista = etapaService.listarTodos().stream()
+                .map(e -> toDTO(e, null))
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(etapas);
+
+        return ResponseEntity.ok(lista);
     }
 
-    // ---------- Excluir etapa ----------
+    // Excluir
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirEtapa(@PathVariable String id) {
         etapaService.excluirEtapa(id);
         return ResponseEntity.noContent().build();
     }
 
-    // ---------- DTO simples para transferência ----------
+    // Conversor interno
+    private EtapaDTO toDTO(Etapa etapa, String tipo) {
+        EtapaDTO dto = new EtapaDTO();
+        dto.setId(etapa.getId().getValor());
+        dto.setNome(etapa.getNome());
+        dto.setOrdem(etapa.getOrdem());
+        dto.setTipo(tipo);
+        return dto;
+    }
+
+    // DTO
     public static class EtapaDTO {
         private String id;
         private String nome;
         private Integer ordem;
+        private String tipo;
 
         public String getId() { return id; }
         public void setId(String id) { this.id = id; }
@@ -79,5 +90,8 @@ public class EtapaController {
 
         public Integer getOrdem() { return ordem; }
         public void setOrdem(Integer ordem) { this.ordem = ordem; }
+
+        public String getTipo() { return tipo; }
+        public void setTipo(String tipo) { this.tipo = tipo; }
     }
 }
