@@ -1,6 +1,8 @@
 package dev.com.confectextil.infraestrutura.persistencia.memoria;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -11,6 +13,8 @@ import dev.com.confectextil.dominio.principal.etapa.EtapaRepository;
 public class EtapaRepositorioMemoria implements EtapaRepository {
     
     private final Map<EtapaId, Etapa> armazenamento = new HashMap<>();
+
+     private final List<Etapa> etapas = new ArrayList<>();
 
     @Override
     public void salvar(Etapa etapa) {
@@ -45,5 +49,9 @@ public class EtapaRepositorioMemoria implements EtapaRepository {
     @Override
     public void excluir(EtapaId etapaId){
         armazenamento.remove(etapaId);
+    }
+      @Override
+    public List<Etapa> listarTodos() {
+        return new ArrayList<>(etapas);
     }
 }

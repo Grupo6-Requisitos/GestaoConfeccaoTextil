@@ -5,6 +5,8 @@ import static org.springframework.boot.SpringApplication.run;
 
 import java.io.IOException;
 
+import dev.com.confectextil.dominio.principal.etapa.EtapaRepository;
+import dev.com.confectextil.dominio.principal.etapa.EtapaService;
 import dev.com.linnea.aplicacao.principal.modelo.ModeloRepositorioAplicacao;
 import dev.com.linnea.aplicacao.principal.modelo.ModeloServicoAplicacao;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,6 +26,11 @@ public class AplicacaoBackend {
 	public ModelMapper modelMapper() {
 		return new ModelMapper();
 	}
+
+	  @Bean
+    public EtapaService etapaService(EtapaRepository etapaRepository) {
+        return new EtapaService(etapaRepository);
+    }
 	
 	/* TEM QUE TROCAR
 	@Bean

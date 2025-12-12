@@ -81,4 +81,9 @@ public class EtapaService {
                 .orElseThrow(() -> new IllegalArgumentException("Etapa não encontrada para exclusão."));
         repository.excluir(etapa.getId());
     }
+
+    public List<Etapa> listarTodos() {
+        return repository.listarTodos();
+    }   
+
 }
