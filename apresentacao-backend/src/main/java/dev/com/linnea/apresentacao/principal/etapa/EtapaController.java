@@ -22,21 +22,24 @@ public class EtapaController {
     // Criar etapa
     @PostMapping
     public ResponseEntity<EtapaDTO> criarEtapa(@RequestBody EtapaDTO dto) {
+        String tipo = dto.getTipo() != null ? dto.getTipo().trim().toUpperCase() : null;
+
         Etapa etapa = etapaService.cadastrarEtapa(
-                dto.getId(), 
-                dto.getNome(), 
-                dto.getOrdem(), 
-                dto.getTipo()
+                dto.getId(),
+                dto.getNome(),
+                dto.getOrdem(),
+                tipo
         );
 
-        return new ResponseEntity<>(toDTO(etapa, dto.getTipo()), HttpStatus.CREATED);
+        return new ResponseEntity<>(toDTO(etapa, tipo), HttpStatus.CREATED);
     }
 
     // Editar etapa
     @PutMapping("/{id}")
     public ResponseEntity<EtapaDTO> editarEtapa(@PathVariable String id, @RequestBody EtapaDTO dto) {
         Etapa etapa = etapaService.editarEtapa(id, dto.getNome(), dto.getOrdem());
-        return ResponseEntity.ok(toDTO(etapa, dto.getTipo()));
+        String tipo = dto.getTipo() != null ? dto.getTipo().trim().toUpperCase() : null;
+        return ResponseEntity.ok(toDTO(etapa, tipo));
     }
 
     // Buscar por ID
@@ -71,7 +74,7 @@ public class EtapaController {
         dto.setId(etapa.getId().getValor());
         dto.setNome(etapa.getNome());
         dto.setOrdem(etapa.getOrdem());
-        dto.setTipo(tipo);
+        dto.setTipo(tipo); // opcional, apenas para informação
         return dto;
     }
 

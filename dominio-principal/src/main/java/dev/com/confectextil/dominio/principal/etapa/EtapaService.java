@@ -2,6 +2,7 @@ package dev.com.confectextil.dominio.principal.etapa;
 
 import dev.com.confectextil.dominio.principal.Etapa;
 
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -9,38 +10,13 @@ import java.util.stream.Collectors;
 public class EtapaService {
 
     private final EtapaRepository repository;
-    private List<EtapaStrategy> estrategias; // Mantemos, mas agora é opcional
+    private final List<EtapaStrategy> estrategias;
 
-    // 🔥 Construtor que os testes esperam
     public EtapaService(EtapaRepository repository) {
-        this.repository = repository;
-        this.estrategias = List.of(); // vazio por padrão para não quebrar
-    }
+    this.repository = repository;
+    this.estrategias = List.of(); // lista vazia por padrão
+}
 
-    // 🔥 Construtor opcional para quando você usar estratégias na aplicação real
-    public EtapaService(EtapaRepository repository, List<EtapaStrategy> estrategias) {
-        this.repository = repository;
-        this.estrategias = estrategias != null ? estrategias : List.of();
-    }
-
-    // 🔥 Método usado pelos testes — sem “tipo”
-    public Etapa cadastrarEtapa(String etapaId, String nome, int ordem) {
-        EtapaId id = EtapaId.novo(etapaId);
-
-        if (repository.buscarPorId(id).isPresent()) {
-            throw new IllegalArgumentException("Etapa já cadastrada");
-        }
-
-        Etapa etapa = new Etapa(id, nome, ordem);
-
-        // aplica estratégia **somente se houver**
-        aplicarEstrategias(etapa);
-
-        repository.salvar(etapa);
-        return etapa;
-    }
-
-    // 🔥 Seu método original com "tipo" continua disponível
     public Etapa cadastrarEtapa(String etapaId, String nome, int ordem, String tipo) {
         EtapaId id = EtapaId.novo(etapaId);
 
@@ -50,28 +26,26 @@ public class EtapaService {
 
         Etapa etapa = new Etapa(id, nome, ordem);
 
-        // aplica estratégia pelo tipo
-        EtapaStrategy estrategia = estrategias.stream()
-                .filter(e -> e.seAplica(tipo))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Tipo de etapa inválido: " + tipo));
-
-        estrategia.processarRegras(etapa);
+        // Aplica estratégia se houver e o tipo for válido
+        if (tipo != null && !tipo.isBlank() && estrategias != null && !estrategias.isEmpty()) {
+            String tipoNormalizado = tipo.trim().toUpperCase();
+            estrategias.stream()
+                    .filter(e -> e.seAplica(tipoNormalizado))
+                    .findFirst()
+                    .ifPresent(e -> e.processarRegras(etapa));
+        }
 
         repository.salvar(etapa);
         return etapa;
     }
-
-    // 🔥 Estratégias opcionais
-    private void aplicarEstrategias(Etapa etapa) {
-        if (estrategias == null || estrategias.isEmpty()) return;
-
-        estrategias.forEach(e -> {
-            if (e.seAplica(null)) {
-                e.processarRegras(etapa);
-            }
-        });
+    public Etapa cadastrarEtapa(String etapaId, String nome, int ordem) {
+    return cadastrarEtapa(etapaId, nome, ordem, null);
+}
+    public EtapaService(EtapaRepository repository, List<EtapaStrategy> estrategias) {
+        this.repository = repository;
+        this.estrategias = estrategias != null ? estrategias : List.of();
     }
+
 
     public Etapa editarEtapa(String etapaId, String novoNome, Integer novaOrdem) {
         EtapaId id = EtapaId.novo(etapaId);
@@ -81,6 +55,27 @@ public class EtapaService {
 
         etapa.atualizar(novoNome, novaOrdem);
         return repository.editar(etapa);
+    }
+
+    public List<Etapa> listarTodos() {
+        return repository.listarTodos();
+    }
+
+    public Etapa buscarPorId(String etapaId) {
+        EtapaId id = EtapaId.novo(etapaId);
+        return repository.buscarPorId(id).orElse(null);
+    }
+
+    public void excluirEtapa(String etapaId) {
+        EtapaId id = EtapaId.novo(etapaId);
+        Etapa etapa = repository.buscarPorId(id)
+                .orElseThrow(() -> new IllegalArgumentException("Etapa não encontrada para exclusão."));
+        repository.excluir(etapa.getId());
+    }
+
+    public boolean existe(String etapaId) {
+        EtapaId id = EtapaId.novo(etapaId);
+        return repository.buscarPorId(id).isPresent();
     }
 
     public void reordenarEtapas(Map<String, Integer> novasOrdensPorId) {
@@ -109,26 +104,5 @@ public class EtapaService {
             etapa.alterarOrdem(novaOrdem);
             repository.editar(etapa);
         });
-    }
-
-    public boolean existe(String etapaId) {
-        EtapaId id = EtapaId.novo(etapaId);
-        return repository.buscarPorId(id).isPresent();
-    }
-
-    public Etapa buscarPorId(String etapaId) {
-        EtapaId id = EtapaId.novo(etapaId);
-        return repository.buscarPorId(id).orElse(null);
-    }
-
-    public void excluirEtapa(String etapaId) {
-        EtapaId id = EtapaId.novo(etapaId);
-        Etapa etapa = repository.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException("Etapa não encontrada para exclusão."));
-        repository.excluir(etapa.getId());
-    }
-
-    public List<Etapa> listarTodos() {
-        return repository.listarTodos();
     }
 }

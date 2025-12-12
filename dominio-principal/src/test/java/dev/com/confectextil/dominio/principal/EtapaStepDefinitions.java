@@ -10,6 +10,7 @@ import io.cucumber.java.pt.Quando;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
