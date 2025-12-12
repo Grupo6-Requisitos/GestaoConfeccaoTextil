@@ -1,12 +1,12 @@
-# 👕 Linnea - Sistema de Gestão para Confecção Têxtil  
+# 👕 Filo - Sistema de Gestão para Confecção Têxtil  
 
-O **Linnea** é um sistema de gestão desenvolvido para **organizar, rastrear e otimizar o processo produtivo de confecções têxteis**.  
+O **Filo** é um sistema de gestão desenvolvido para **organizar, rastrear e otimizar o processo produtivo de confecções têxteis**.  
 Ele foi concebido com base em **Domain-Driven Design (DDD)**, tendo como **core domain** o **controle das etapas da produção** — desde o corte até a expedição — garantindo **padronização, rastreabilidade e visibilidade** em tempo real das fichas técnicas em produção.
 
 ## 🧭 Visão Geral do Domínio
 
 A confecção têxtil transforma **matérias-primas** (tecidos, aviamentos, insumos) em **peças de vestuário**.  
-O Linnea atua como um **sistema de gestão de processos**, garantindo que todas as **fichas técnicas** — o documento mestre da produção — avancem de forma organizada pelas etapas configuradas.
+O Filo atua como um **sistema de gestão de processos**, garantindo que todas as **fichas técnicas** — o documento mestre da produção — avancem de forma organizada pelas etapas configuradas.
 
 O sistema atende dois contextos de negócio:
 - **B2B (Business to Business):** a ficha técnica é **vinculada a um pedido de cliente**, permitindo rastreabilidade completa até a entrega.  
@@ -35,7 +35,7 @@ Editar Empresa:
 <img width="1319" alt="protipo-baixa-editar-empresa" src="https://github.com/user-attachments/assets/4f19c65d-6e89-4351-a8dc-768d86ea6651" >
 <br>
 Demais Funcionalidades:
-<a href="https://linnea.lovable.app/" target="_blank">Protótipos de Baixa Fidelidade</a>
+<a href="https://Filo.lovable.app/" target="_blank">Protótipos de Baixa Fidelidade</a>
 <br>
 </details>
 
