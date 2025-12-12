@@ -18,7 +18,7 @@ public class Fabrico {
 
 
     public Fabrico(String nomeFantasia, String cnpj) {
-        this.id = new FabricoId();
+        this.id = FabricoId.novo();
         
         setNomeFantasia(nomeFantasia);
         setCnpj(cnpj);
