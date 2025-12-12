@@ -5,9 +5,10 @@ import java.util.List;
 
 public class ParceiroService {
     private final ParceiroRepositorio repositorio;
-
-    public ParceiroService(ParceiroRepositorio repositorio){
+    private final List<ObservadorNovoParceiro> observadores;
+    public ParceiroService(ParceiroRepositorio repositorio, List<ObservadorNovoParceiro> observadores){
         this.repositorio = repositorio;
+        this.observadores = observadores;
     }
 
     public void cadastrar(String id, String nome, String telefone){
@@ -17,6 +18,13 @@ public class ParceiroService {
         }
         Parceiro parceiro = new Parceiro(parceiroId, nome, telefone);
         repositorio.salvar(parceiro);
+        notificarObservadores(parceiro);
+    }
+
+    private void notificarObservadores(Parceiro parceiro) {
+        for (ObservadorNovoParceiro obs : observadores) {
+            obs.executadoAposCadastro(parceiro);
+        }
     }
 
     public Parceiro editar(String id, String novoNome, String novoTelefone) {

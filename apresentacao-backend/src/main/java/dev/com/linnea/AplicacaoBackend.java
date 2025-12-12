@@ -1,4 +1,3 @@
-
 package dev.com.linnea;
 
 import static org.springframework.boot.SpringApplication.run;
@@ -9,10 +8,16 @@ import dev.com.confectextil.dominio.principal.etapa.EtapaRepository;
 import dev.com.confectextil.dominio.principal.etapa.EtapaService;
 import dev.com.linnea.aplicacao.principal.modelo.ModeloRepositorioAplicacao;
 import dev.com.linnea.aplicacao.principal.modelo.ModeloServicoAplicacao;
+import dev.com.confectextil.dominio.principal.parceiro.ObservadorNovoParceiro;
+import dev.com.confectextil.dominio.principal.parceiro.ParceiroRepositorio;
+import dev.com.confectextil.dominio.principal.parceiro.ParceiroService;
+import dev.com.linnea.aplicacao.principal.parceiro.ParceiroRepositorioAplicacao;
+import dev.com.linnea.aplicacao.principal.parceiro.ParceiroServicoAplicacao;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.modelmapper.ModelMapper;
 
+import java.util.List;
 
 @SpringBootApplication
 public class AplicacaoBackend {
@@ -31,7 +36,17 @@ public class AplicacaoBackend {
     public EtapaService etapaService(EtapaRepository etapaRepository) {
         return new EtapaService(etapaRepository);
     }
-	
+
+	@Bean
+	public ParceiroService parceiroService(ParceiroRepositorio repositorio, List<ObservadorNovoParceiro> observadores) {
+		return new ParceiroService(repositorio, observadores);
+	}
+
+	@Bean
+	public ParceiroServicoAplicacao parceiroServicoAplicacao(ParceiroService parceiroService,ParceiroRepositorioAplicacao repositorioAplicacao) {
+		return new ParceiroServicoAplicacao(parceiroService, repositorioAplicacao);
+	}
+
 	/* TEM QUE TROCAR
 	@Bean
 	public AutorServico autorServico(AutorRepositorio repositorio) {
