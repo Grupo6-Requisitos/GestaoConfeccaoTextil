@@ -1,4 +1,3 @@
-/*
 package dev.com.linnea.apresentacao.principal.fabrico;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,4 +44,3 @@ public class FabricoControlador {
         }
     }
 }
- */
