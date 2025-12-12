@@ -26,7 +26,7 @@ public class ParceiroStepDefinitions {
     @Before
     public void setup() {
         repositorio = new ParceiroRepositorioMemoria();
-        service = new ParceiroService(repositorio);
+        service = new ParceiroService(repositorio, java.util.Collections.emptyList());
         excecaoCapturada = null;
         idEmContexto = null;
         listaDeParceiros = null;
