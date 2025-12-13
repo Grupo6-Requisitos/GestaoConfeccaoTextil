@@ -11,6 +11,8 @@ export default defineConfig({
         target: "http://localhost:8080",
         changeOrigin: true,
         secure: false,
+        // remove o prefixo /api antes de chegar no backend Spring (/modelos, etc)
+        rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
   },
