@@ -45,6 +45,10 @@ public class FabricoService {
         return repository.buscarPorId(id).orElse(null);
     }
 
+    public java.util.List<Fabrico> listarTodos() {
+        return repository.listarTodos();
+    }
+
     public Fabrico editarFabricoPorCnpj(String cnpjAlvo, String novoNomeFantasia) {
         return new EditarFabricoPorCnpjTemplate(repository, cnpjAlvo, novoNomeFantasia).executar();
     }

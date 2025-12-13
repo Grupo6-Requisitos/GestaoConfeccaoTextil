@@ -10,10 +10,11 @@ const FILTERS = [
   { value: "cnpj", label: "CNPJ" },
 ];
 
+const ENDPOINT = "/api/fabricos";
+
 export default function Fabricos() {
-  // toggle: quando chegar o backend ative (true) e descomente chamadas API.
-  // const USE_API = true;
-  const USE_API = false; // por enquanto in-memory
+  // toggle para usar backend real
+  const USE_API = true;
 
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState(FILTERS[0].value);
@@ -53,12 +54,13 @@ export default function Fabricos() {
       try {
         setLoading(true);
         setError("");
-        // const { data } = await api.get("/fabricos"); // <-- descomente quando backend existir
-        // if (!active) return;
-        // setFabricos((data || []).map((f) => normalize(f)));
+        const { data } = await api.get(ENDPOINT);
+        if (!active) return;
+        setFabricos((data || []).map((f, idx) => normalize(f, idx)));
       } catch (err) {
         console.error("Erro ao carregar fabricos", err);
-        if (active) setError("Não foi possível carregar fábricas.");
+        const msg = err?.response?.data?.mensagem || "Não foi possível carregar fábricas.";
+        if (active) setError(msg);
       } finally {
         if (active) setLoading(false);
       }
@@ -70,9 +72,13 @@ export default function Fabricos() {
   // ---------- Helpers ----------
   function normalize(raw, idx = 0) {
     return {
-      id: raw.fab_id ?? raw.id ?? idx + 1,
-      name: raw.fab_nf ?? raw.name ?? `Fábrica ${idx + 1}`,
-      cnpj: raw.fab_cnpj ?? raw.cnpj ?? "",
+      id: raw.id?.valor ?? raw.id ?? raw.fabricoId ?? raw.fab_id ?? idx + 1,
+      name:
+        raw.nomeFantasia ??
+        raw.fab_nf ??
+        raw.name ??
+        `Fábrica ${idx + 1}`,
+      cnpj: raw.cnpj ?? raw.fab_cnpj ?? raw.cnpjFormatado ?? "",
     };
   }
 
@@ -84,10 +90,13 @@ export default function Fabricos() {
   // ---------- CRUD (in-memory implementations + commented API examples) ----------
   async function createFabrico(payload) {
     if (USE_API) {
-      // API example:
-      // const { data } = await api.post("/fabricos", { fab_nf: payload.name, fab_cnpj: payload.cnpj });
-      // return normalize(data);
-      return null;
+      const { data } = await api.post(ENDPOINT, {
+        nomeFantasia: payload.name,
+        cnpj: payload.cnpj,
+      });
+      const novo = normalize(data);
+      setFabricos((prev) => [novo, ...prev]);
+      return novo;
     } else {
       // in-memory
       const newItem = { id: nextId(), name: payload.name, cnpj: payload.cnpj };
@@ -98,10 +107,17 @@ export default function Fabricos() {
 
   async function updateFabrico(id, payload) {
     if (USE_API) {
-      // API example:
-      // const { data } = await api.put(`/fabricos/${id}`, { fab_nf: payload.name, fab_cnpj: payload.cnpj });
-      // return normalize(data);
-      return null;
+      const { data } = await api.put(`${ENDPOINT}/${id}`, {
+        nomeFantasia: payload.name,
+        cnpj: payload.cnpj,
+      });
+      const atualizado = normalize(data);
+      setFabricos((prev) =>
+        prev.map((f) =>
+          f.id === id || String(f.id) === String(atualizado.id) ? atualizado : f
+        )
+      );
+      return atualizado;
     } else {
       setFabricos((prev) =>
         prev.map((f) => (f.id === id ? { ...f, ...payload } : f))
@@ -112,8 +128,8 @@ export default function Fabricos() {
 
   async function deleteFabrico(id) {
     if (USE_API) {
-      // API example:
-      // await api.delete(`/fabricos/${id}`);
+      // backend ainda não expõe exclusão; removemos apenas do estado local
+      setFabricos((prev) => prev.filter((f) => String(f.id) !== String(id)));
       return;
     } else {
       setFabricos((prev) => prev.filter((f) => f.id !== id));
@@ -153,32 +169,35 @@ export default function Fabricos() {
     setSaving(true);
     setError("");
     try {
+      const trimmedName = form.name.trim();
+      const trimmedCnpj = form.cnpj.trim();
+      if (!trimmedName || !trimmedCnpj) {
+        setError("Informe nome fantasia e CNPJ.");
+        return;
+      }
+
       if (modalMode === "create") {
         const created = await createFabrico({
-          name: form.name.trim(),
-          cnpj: form.cnpj.trim(),
+          name: trimmedName,
+          cnpj: trimmedCnpj,
         });
         // if API returned object you might set created var accordingly
         // setFabricos((prev) => [created, ...prev]); // already done in in-memory path
         setModalItem(created);
         setModalMode("view");
       } else if (modalMode === "edit" && modalItem) {
-        await updateFabrico(modalItem.id, {
-          name: form.name.trim(),
-          cnpj: form.cnpj.trim(),
+        const updated = await updateFabrico(modalItem.id, {
+          name: trimmedName,
+          cnpj: trimmedCnpj,
         });
         // update local state already done in in-memory function
-        const updated = {
-          id: modalItem.id,
-          name: form.name.trim(),
-          cnpj: form.cnpj.trim(),
-        };
-        setModalItem(updated);
+        setModalItem(updated || modalItem);
         setModalMode("view");
       }
     } catch (err) {
       console.error("Erro salvar fabrico", err);
-      setError("Não foi possível salvar a fábrica.");
+      const msg = err?.response?.data?.mensagem || "Não foi possível salvar a fábrica.";
+      setError(msg);
     } finally {
       setSaving(false);
     }
@@ -399,6 +418,8 @@ export default function Fabricos() {
                   <label className="field">
                     <span>CNPJ</span>
                     <input
+                      required
+                      placeholder="11.111.111/1111-11"
                       value={form.cnpj}
                       onChange={(e) =>
                         setForm((s) => ({ ...s, cnpj: e.target.value }))
@@ -443,6 +464,8 @@ export default function Fabricos() {
                   <label className="field">
                     <span>CNPJ</span>
                     <input
+                      required
+                      placeholder="11.111.111/1111-11"
                       value={form.cnpj}
                       onChange={(e) =>
                         setForm((s) => ({ ...s, cnpj: e.target.value }))

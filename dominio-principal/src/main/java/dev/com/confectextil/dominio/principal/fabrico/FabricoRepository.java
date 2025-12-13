@@ -1,6 +1,7 @@
 package dev.com.confectextil.dominio.principal.fabrico;
 
 import dev.com.confectextil.dominio.principal.Fabrico;
+import java.util.List;
 import java.util.Optional;
 
 public interface FabricoRepository {
@@ -11,4 +12,6 @@ public interface FabricoRepository {
 
     Optional<Fabrico> buscarPorId(FabricoId fabricoId);
     Optional<Fabrico> buscarPorCnpj(String cnpj);
+
+    List<Fabrico> listarTodos();
 }

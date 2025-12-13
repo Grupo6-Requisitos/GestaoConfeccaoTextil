@@ -3,6 +3,7 @@ package dev.com.linnea.infraestrutura.persistencia.jpa.fabrico;
 import dev.com.confectextil.dominio.principal.fabrico.FabricoId;
 import dev.com.confectextil.dominio.principal.fabrico.FabricoRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,5 +94,13 @@ class FabricoRepositorioImpl implements FabricoRepository {
     public Optional<Fabrico> buscarPorCnpj(String cnpj) {
         return repositorio.findByCnpj(cnpj)
                           .map(FabricoJpa::toDomain);
+    }
+
+    @Override
+    public List<Fabrico> listarTodos() {
+        return repositorio.findAll()
+                .stream()
+                .map(FabricoJpa::toDomain)
+                .toList();
     }
 }

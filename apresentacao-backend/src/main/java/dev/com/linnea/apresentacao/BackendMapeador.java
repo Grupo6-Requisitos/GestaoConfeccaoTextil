@@ -33,6 +33,20 @@ public class BackendMapeador extends ModelMapper {
             }
         });
 
+        addConverter(new AbstractConverter<Fabrico, FabricoDto>() {
+            @Override
+            protected FabricoDto convert(Fabrico source) {
+                if (source == null) {
+                    return null;
+                }
+                FabricoDto dto = new FabricoDto();
+                dto.id = source.getId() != null ? source.getId().valor() : null;
+                dto.nomeFantasia = source.getNomeFantasia();
+                dto.cnpj = source.getCnpj();
+                return dto;
+            }
+        });
+
         addConverter(new AbstractConverter<String, FabricoId>() {
             @Override
             protected FabricoId convert(String source) {

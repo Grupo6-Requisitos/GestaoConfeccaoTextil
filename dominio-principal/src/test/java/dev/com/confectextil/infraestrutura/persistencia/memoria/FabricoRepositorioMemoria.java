@@ -1,10 +1,10 @@
 package dev.com.confectextil.infraestrutura.persistencia.memoria;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 import dev.com.confectextil.dominio.principal.Fabrico;
 import dev.com.confectextil.dominio.principal.fabrico.FabricoId;
@@ -13,8 +13,6 @@ import dev.com.confectextil.dominio.principal.fabrico.FabricoRepository;
 public class FabricoRepositorioMemoria implements FabricoRepository {
 
     private final Map<FabricoId, Fabrico> armazenamento = new HashMap<>();
-
-     private final List<Fabrico> fabricos = new ArrayList<>();
 
     @Override
     public void salvar(Fabrico fabrico) {
@@ -33,9 +31,9 @@ public class FabricoRepositorioMemoria implements FabricoRepository {
         return fabrico;
     }
 
-     @Override
+    @Override
     public Optional<Fabrico> buscarPorCnpj(String cnpj) {
-        return fabricos.stream()
+        return armazenamento.values().stream()
                        .filter(f -> f.getCnpj().equals(cnpj))
                        .findFirst();
     }
@@ -43,6 +41,11 @@ public class FabricoRepositorioMemoria implements FabricoRepository {
     @Override
     public Optional<Fabrico> buscarPorId(FabricoId fabricoId) {
         return Optional.ofNullable(armazenamento.get(fabricoId));
+    }
+
+    @Override
+    public List<Fabrico> listarTodos() {
+        return new ArrayList<>(armazenamento.values());
     }
 
     public boolean existsById(FabricoId fabricoId) {
