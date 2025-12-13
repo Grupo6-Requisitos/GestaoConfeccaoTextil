@@ -18,7 +18,7 @@ public class ModeloService {
         this.insumoRepository = Objects.requireNonNull(insumoRepository);
     }
 
-    public record InsumoPadraoDTO(String insumoReferencia, double quantidadeSugerida) {}
+    public record InsumoPadraoDTO(String insumoId, double quantidadeSugerida) {}
 
     public Modelo cadastrarModelo(String referencia, String nome, String imagemUrl, List<InsumoPadraoDTO> insumos) {
 
@@ -28,8 +28,9 @@ public class ModeloService {
 
         List<InsumoPadrao> insumosPadrao = insumos.stream()
             .map(dto -> {
-                dev.com.confectextil.dominio.principal.Insumo insumo = insumoRepository.buscarPorReferencia(dto.insumoReferencia())
-                    .orElseThrow(() -> new IllegalArgumentException("O insumo com referência " + dto.insumoReferencia() + " não foi encontrado"));
+                var insumoId = dev.com.confectextil.dominio.principal.insumo.InsumoId.novo(dto.insumoId());
+                dev.com.confectextil.dominio.principal.Insumo insumo = insumoRepository.buscarPorId(insumoId)
+                    .orElseThrow(() -> new IllegalArgumentException("O insumo com id " + dto.insumoId() + " não foi encontrado"));
 
                 return new InsumoPadrao(insumo.getId(), dto.quantidadeSugerida());
             })
@@ -94,6 +95,59 @@ public class ModeloService {
             nomeFinal,
             existente.getImagemUrl(),
             existente.getInsumosPadrao()
+        );
+
+        modeloRepository.atualizar(referenciaAlvo, atualizado);
+
+        return atualizado;
+    }
+
+    public Modelo atualizarModelo(String referenciaAlvo, String novaReferencia, String novoNome, List<InsumoPadraoDTO> novosInsumos) {
+        if (referenciaAlvo == null || referenciaAlvo.isBlank()) {
+            throw new IllegalArgumentException("Referência alvo não informada");
+        }
+
+        Modelo existente = modeloRepository.buscarPorReferencia(referenciaAlvo)
+            .orElseThrow(() -> new IllegalStateException("O modelo com referência " + referenciaAlvo + " não foi encontrado"));
+
+        String referenciaFinal = existente.getReferencia();
+        if (novaReferencia != null) {
+            if (novaReferencia.isBlank()) {
+                throw new IllegalArgumentException("A nova referência é obrigatória");
+            }
+            if (!novaReferencia.equals(referenciaFinal) && modeloRepository.buscarPorReferencia(novaReferencia).isPresent()) {
+                throw new IllegalStateException("Já existe um modelo com a referência " + novaReferencia);
+            }
+            referenciaFinal = novaReferencia;
+        }
+
+        String nomeFinal = existente.getNome();
+        if (novoNome != null) {
+            if (novoNome.isBlank()) {
+                throw new IllegalArgumentException("O nome do modelo é obrigatório");
+            }
+            nomeFinal = novoNome;
+        }
+
+        List<InsumoPadrao> insumosFinais = existente.getInsumosPadrao();
+        if (novosInsumos != null) {
+            insumosFinais = novosInsumos.stream()
+                .map(dto -> {
+                    var insumoId = dev.com.confectextil.dominio.principal.insumo.InsumoId.novo(dto.insumoId());
+                    dev.com.confectextil.dominio.principal.Insumo insumo = insumoRepository.buscarPorId(insumoId)
+                        .orElseThrow(() -> new IllegalArgumentException("O insumo com id " + dto.insumoId() + " não foi encontrado"));
+
+                    return new InsumoPadrao(insumo.getId(), dto.quantidadeSugerida());
+                })
+                .collect(Collectors.toList());
+        }
+
+        Modelo atualizado = new Modelo(
+            existente.getId(),
+            referenciaFinal,
+            nomeFinal,
+            existente.getImagemUrl(),
+            insumosFinais
         );
 
         modeloRepository.atualizar(referenciaAlvo, atualizado);

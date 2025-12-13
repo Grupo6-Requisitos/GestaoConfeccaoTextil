@@ -3,5 +3,7 @@ package dev.com.linnea.aplicacao.principal.modelo;
 import java.util.List;
 
 public interface ModeloRepositorioAplicacao {
-    List<ModeloResumo> listarResumo();
-} 
+    List<ModeloResumo> listarTodosResumo();
+    ModeloResumo listarEspecificoResumo(String referencia);
+    Iterable<ModeloResumo> iterarTodosResumo();
+}

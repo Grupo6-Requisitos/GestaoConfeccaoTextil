@@ -6,4 +6,8 @@ public interface ModeloResumo {
 	String getNome();
 
     String getReferencia();
+
+    String getImagemUrl();
+
+    java.util.List<InsumoPadraoResumo> getInsumosPadrao();
 }

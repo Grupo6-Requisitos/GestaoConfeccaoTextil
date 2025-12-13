@@ -1,6 +1,7 @@
 package dev.com.confectextil.infraestrutura.persistencia.memoria;
 
 import dev.com.confectextil.dominio.principal.Insumo;
+import dev.com.confectextil.dominio.principal.insumo.InsumoId;
 import dev.com.confectextil.dominio.principal.insumo.InsumoRepository;
 
 import java.util.HashMap;
@@ -19,6 +20,16 @@ public class InsumoRepositorioMemoria implements InsumoRepository {
     @Override
     public Optional<Insumo> buscarPorReferencia(String referencia) {
         return Optional.ofNullable(armazenamento.get(referencia));
+    }
+
+    @Override
+    public Optional<Insumo> buscarPorId(InsumoId id) {
+        if (id == null) {
+            return Optional.empty();
+        }
+        return armazenamento.values().stream()
+                .filter(i -> id.equals(i.getId()))
+                .findFirst();
     }
 
     public void limpar() {

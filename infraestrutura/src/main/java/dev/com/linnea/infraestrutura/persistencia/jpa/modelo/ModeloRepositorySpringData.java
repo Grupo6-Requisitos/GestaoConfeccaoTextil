@@ -11,4 +11,5 @@ public interface ModeloRepositorySpringData extends JpaRepository<ModeloJpa, Str
     Optional<ModeloJpa> findByReferencia(String referencia);
     void deleteByReferencia(String referencia);
     List<ModeloResumo> findAllProjectedBy();
+    ModeloResumo findProjectedByReferencia(String referencia);
 }

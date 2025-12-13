@@ -10,6 +10,11 @@ import dev.com.confectextil.dominio.principal.etapa.EtapaService;
 import dev.com.confectextil.dominio.principal.etapa.EtapaStrategy;
 import dev.com.confectextil.dominio.principal.etapa.strategy.EtapaProducaoStrategy;
 import dev.com.confectextil.dominio.principal.etapa.strategy.EtapaQualidadeStrategy;
+import dev.com.confectextil.dominio.principal.fabrico.FabricoRepository;
+import dev.com.confectextil.dominio.principal.fabrico.FabricoService;
+import dev.com.confectextil.dominio.principal.insumo.InsumoRepository;
+import dev.com.confectextil.dominio.principal.modelo.ModeloRepository;
+import dev.com.confectextil.dominio.principal.modelo.ModeloService;
 import dev.com.linnea.aplicacao.principal.modelo.ModeloRepositorioAplicacao;
 import dev.com.linnea.aplicacao.principal.modelo.ModeloServicoAplicacao;
 import dev.com.confectextil.dominio.principal.parceiro.ObservadorNovoParceiro;
@@ -21,10 +26,20 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.modelmapper.ModelMapper;
 
-import java.util.List;
 
 @SpringBootApplication
 public class AplicacaoBackend {
+
+	@Bean
+	public FabricoService fabricoService(FabricoRepository fabricoRepo) {
+    return new FabricoService(fabricoRepo);
+	}
+	
+
+	@Bean
+	public ModeloService modeloService(ModeloRepository modeloRepo, InsumoRepository insumoRepo) {
+    return new ModeloService(modeloRepo, insumoRepo);
+	}
 
 	@Bean
 	public ModeloServicoAplicacao modeloServicoAplicacao(ModeloRepositorioAplicacao repositorio) {
@@ -36,7 +51,7 @@ public class AplicacaoBackend {
 		return new ModelMapper();
 	}
 
-	   @Bean
+	@Bean
     public EtapaService etapaService(EtapaRepository etapaRepository) {
         List<EtapaStrategy> estrategias = List.of(
             new EtapaProducaoStrategy(),
@@ -54,45 +69,6 @@ public class AplicacaoBackend {
 	public ParceiroServicoAplicacao parceiroServicoAplicacao(ParceiroService parceiroService,ParceiroRepositorioAplicacao repositorioAplicacao) {
 		return new ParceiroServicoAplicacao(parceiroService, repositorioAplicacao);
 	}
-
-	/* TEM QUE TROCAR
-	@Bean
-	public AutorServico autorServico(AutorRepositorio repositorio) {
-		return new AutorServico(repositorio);
-	}
-
-	@Bean
-	public ExemplarServico exemplarServico(ExemplarRepositorio repositorio) {
-		return new ExemplarServico(repositorio);
-	}
-
-	@Bean
-	public ExemplarServicoAplicacao exemplarServicoAplicacao(ExemplarRepositorioAplicacao repositorio) {
-		return new ExemplarServicoAplicacao(repositorio);
-	}
-
-	@Bean
-	public EmprestimoServico emprestimoServico(ExemplarRepositorio exemplarRepositorio, EventoBarramento barramento) {
-		return new EmprestimoServico(exemplarRepositorio, barramento);
-	}
-
-	@Bean
-	public LivroServico livroServico(LivroRepositorio repositorio) {
-		return new LivroServico(repositorio);
-	}
-
-	@Bean
-	public LivroServicoAplicacao livroServicoAplicacao(LivroRepositorioAplicacao repositorio) {
-		return new LivroServicoAplicacao(repositorio);
-	}
-
-	@Bean
-	public EmprestimoRegistroServicoAplicacao emprestimoRegistroServicoAplicacao(
-			EmprestimoRegistroRepositorio repositorio, EmprestimoRegistroRepositorioAplicacao repositorioAplicacao,
-			EventoBarramento servico) {
-		return new EmprestimoRegistroServicoAplicacao(repositorio, repositorioAplicacao, servico);
-	}
-*/
 
 	public static void main(String[] args) throws IOException {
 		run(AplicacaoBackend.class, args);

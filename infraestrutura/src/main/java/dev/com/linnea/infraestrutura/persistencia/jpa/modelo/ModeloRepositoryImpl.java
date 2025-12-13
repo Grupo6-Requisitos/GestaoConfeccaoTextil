@@ -2,6 +2,9 @@ package dev.com.linnea.infraestrutura.persistencia.jpa.modelo;
 
 import dev.com.confectextil.dominio.principal.Modelo;
 import dev.com.confectextil.dominio.principal.modelo.ModeloRepository;
+import dev.com.linnea.aplicacao.principal.modelo.ModeloRepositorioAplicacao;
+import dev.com.linnea.aplicacao.principal.modelo.ModeloResumo;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -9,7 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ModeloRepositoryImpl implements ModeloRepository {
+public class ModeloRepositoryImpl implements ModeloRepository, ModeloRepositorioAplicacao  {
 
     private final ModeloRepositorySpringData springData;
     private final ModelMapper mapper;
@@ -39,6 +42,13 @@ public class ModeloRepositoryImpl implements ModeloRepository {
     }
 
     @Override
+    public Iterable<Modelo> iterarTodos() {
+        return springData.findAll().stream()
+                .map(j -> j.toDomain(mapper))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void removerPorReferencia(String referencia) {
         springData.deleteByReferencia(referencia);
     }
@@ -51,5 +61,20 @@ public class ModeloRepositoryImpl implements ModeloRepository {
             jpa.setId(existing.getId());
             springData.save(jpa);
         });
+    }
+
+    @Override
+    public List<ModeloResumo> listarTodosResumo() {
+        return springData.findAllProjectedBy();
+    }
+
+    @Override
+    public Iterable<ModeloResumo> iterarTodosResumo() {
+        return springData.findAllProjectedBy();
+    }
+
+    @Override
+    public ModeloResumo listarEspecificoResumo(String referencia) {
+        return springData.findProjectedByReferencia(referencia);
     }
 }

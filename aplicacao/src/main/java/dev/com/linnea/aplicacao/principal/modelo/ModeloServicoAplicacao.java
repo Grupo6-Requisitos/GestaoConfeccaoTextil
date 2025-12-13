@@ -14,7 +14,15 @@ public class ModeloServicoAplicacao {
         this.repositorio = repositorio;
     }
 
-    public List<ModeloResumo> listarModelosResumo() {
-        return repositorio.listarResumo();
+    public List<ModeloResumo> listarTodosResumo() {
+        return repositorio.listarTodosResumo();
+    }
+
+    public Iterable<ModeloResumo> iterarTodosResumo() {
+        return repositorio.iterarTodosResumo();
+    }
+
+    public ModeloResumo listarEspecificoResumo(String referencia) {
+        return repositorio.listarEspecificoResumo(referencia);
     }
 }

@@ -29,6 +29,11 @@ public class ModeloRepositorioMemoria implements ModeloRepository {
     }
 
     @Override
+    public Iterable<Modelo> iterarTodos() {
+        return new ArrayList<>(armazenamento.values());
+    }
+
+    @Override
     public void removerPorReferencia(String referencia) {
         armazenamento.remove(referencia);
     }

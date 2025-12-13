@@ -7,4 +7,5 @@ import dev.com.confectextil.dominio.principal.Insumo;
 public interface InsumoRepository {
     void salvar(Insumo insumo);
     Optional<Insumo> buscarPorReferencia(String referencia);
+    Optional<Insumo> buscarPorId(InsumoId id);
 }
