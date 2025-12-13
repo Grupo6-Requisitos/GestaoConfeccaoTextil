@@ -4,6 +4,7 @@ import MainLayout from "./layouts/MainLayout";
 import Produtos from "./pages/Produtos";
 import Parceiros from "./pages/Parceiros";
 import Etapas from "./pages/Etapas"; // <--- Importar
+import Fabricos from "./pages/Fabricos";
 
 function Home() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="produtos" element={<Produtos />} />
         <Route path="parceiros" element={<Parceiros />} />
         <Route path="etapas" element={<Etapas />} />
+        <Route path="fabricos" element={<Fabricos />} />
       </Route>
     </Routes>
   );
