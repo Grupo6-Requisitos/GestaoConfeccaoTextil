@@ -31,3 +31,21 @@ O padrão Strategy foi utilizado no domínio de **Etapas**. O objetivo foi permi
 - EtapaService (Context):
   - Alterada para conter uma lista de EtapaStrategy.
   - No método cadastrarEtapa, foi adicionada a lógica que percorre a lista de estratégias, encontra a correta para o tipo informado e executa a regra de negócio.
+
+  Padrão Template Method
+
+**Contexto da Adoção:**
+Aplicado no fluxo de salvar/editar **Fabrico**, para definir um esqueleto único de operação e permitir ganchos (validação, pós-processamento) sem duplicar lógica.
+
+**Classes Criadas:**
+- FabricoOperacaoTemplate: método template `executar()` que chama validarEntrada → carregarOuCriar → aplicarAlteracoes → validarNegocio → persistir → posPersistir.
+- CadastrarFabricoTemplate: concretiza criação (normaliza CNPJ, verifica duplicidade, salva).
+- EditarFabricoPorIdTemplate: concretiza edição por ID (carrega, atualiza nome, mantém CNPJ imutável, persiste).
+- EditarFabricoPorCnpjTemplate: concretiza edição por CNPJ com fallback de busca e atualização de nome.
+
+**Classe Alterada:**
+- FabricoService: delega cadastrar/editar para os templates, preservando regras já existentes (normalização e unicidade de CNPJ, CNPJ imutável).
+
+Proxy
+
+- ModeloServiceProxy (apresentação-backend): envolve ModeloService adicionando logs/auditoria ao atualizar modelos, sem alterar a lógica principal (padrão Proxy).

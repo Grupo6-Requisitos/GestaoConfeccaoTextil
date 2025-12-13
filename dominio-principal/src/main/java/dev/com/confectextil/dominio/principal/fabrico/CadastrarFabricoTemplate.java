@@ -1,7 +1,6 @@
 package dev.com.confectextil.dominio.principal.fabrico;
 
 import dev.com.confectextil.dominio.principal.Fabrico;
-import dev.com.confectextil.dominio.principal.fabrico.FabricoId;
 
 class CadastrarFabricoTemplate extends FabricoOperacaoTemplate {
 
