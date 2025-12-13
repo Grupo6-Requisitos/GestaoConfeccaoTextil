@@ -40,6 +40,13 @@ public class BackendMapeador extends ModelMapper {
             }
         });
 
+        addConverter(new AbstractConverter<String, FabricoId>() {
+            @Override
+            protected FabricoId convert(String source) {
+                return FabricoId.novo(source);
+            }
+        });
+
         addConverter(new AbstractConverter<ModeloDto, Modelo>() {
             @Override
             protected Modelo convert(ModeloDto source) {

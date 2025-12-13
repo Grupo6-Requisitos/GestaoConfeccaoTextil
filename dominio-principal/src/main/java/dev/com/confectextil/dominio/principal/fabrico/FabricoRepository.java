@@ -10,6 +10,5 @@ public interface FabricoRepository {
     Fabrico editar(Fabrico fabrico);
 
     Optional<Fabrico> buscarPorId(FabricoId fabricoId);
-
     Optional<Fabrico> buscarPorCnpj(String cnpj);
 }

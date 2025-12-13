@@ -58,6 +58,37 @@ public class ParceiroController {
         }
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> buscarParceiro(@PathVariable String id) {
+        try {
+            Parceiro parceiro = parceiroService.buscarPorId(id);
+            if (parceiro == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Parceiro não encontrado"));
+            }
+            return ResponseEntity.ok(ParceiroResponse.fromDomain(parceiro));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new ErrorResponse("Erro interno ao buscar parceiro"));
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editarParceiro(@PathVariable String id, @RequestBody CadastrarParceiroRequest request) {
+        try {
+            Parceiro atualizado = parceiroService.editar(
+                id,
+                request.nome(),
+                request.telefone()
+            );
+            return ResponseEntity.ok(ParceiroResponse.fromDomain(atualizado));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new ErrorResponse("Erro interno ao editar parceiro"));
+        }
+    }
+
     public record CadastrarParceiroRequest(
             String id,
             String nome,
