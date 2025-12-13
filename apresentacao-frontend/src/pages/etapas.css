@@ -1,0 +1,198 @@
+/* Container que permite rolagem horizontal */
+.kanban-container {
+  display: flex;
+  overflow-x: auto;
+  height: 100%;
+  padding-top: 24px;
+  /* Scrollbar fina */
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+}
+
+/* Estilo de cada coluna */
+.kanban-column {
+  min-width: 300px; /* Largura mínima para não espremer */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;
+  border-right: 1px solid #e0e0e0; /* Divisória vertical */
+}
+
+.kanban-column:last-child {
+  border-right: none; /* Última coluna não tem borda */
+}
+
+/* Cabeçalho cinza arredondado (Pill) */
+.column-header {
+  background-color: #E0E0E0;
+  border-radius: 50px;
+  padding: 10px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  color: #111;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+/* Ícones do cabeçalho */
+.header-icon {
+  cursor: pointer;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.header-icon:hover {
+  background-color: rgba(0,0,0,0.05);
+  color: #000;
+}
+
+/* Botão Adicionar Coluna (Estilo Outline) */
+.btn-add-column {
+  border: 1px solid #111;
+  background: white;
+  color: #111;
+  border-radius: 50px;
+  padding: 8px 20px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  font-family: "Outfit", sans-serif;
+  margin-bottom: 0;
+}
+
+.btn-add-column:hover {
+  background-color: #f5f5f5;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Área onde ficariam os cards (Vazia por enquanto) */
+.column-body {
+  flex: 1;
+  min-height: 200px;
+  border-radius: 8px;
+  /* Opcional: cor de fundo sutil para visualizar a área */
+  /* background-color: #f9f9f9; */
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Fundo escuro igual Parceiros */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  font-family: 'Outfit', sans-serif;
+  animation: fadeIn 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal h2 {
+  margin-top: 0;
+  color: #333; /* Título escuro */
+  margin-bottom: 24px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* Estilo dos Inputs (Igual Parceiros) */
+.form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+
+/* Input e Select com mesmo visual */
+.form-input, .form-select {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+  width: 100%;
+  background-color: white;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus, .form-select:focus {
+  border-color: #4696ad;
+}
+
+/* Botões do Rodapé */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.btn-cancel {
+  background: transparent;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #555;
+  transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+  background-color: #f5f5f5;
+}
+
+.btn-save {
+  background-color: #111; /* Preto sólido */
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-save:hover {
+  background-color: #333;
+}

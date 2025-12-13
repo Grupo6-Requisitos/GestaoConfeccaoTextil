@@ -2,8 +2,9 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import Produtos from "./pages/Produtos";
+import Parceiros from "./pages/Parceiros";
+import Etapas from "./pages/Etapas"; // <--- Importar
 
-// Simple placeholder page for root (you can replace later)
 function Home() {
   return (
     <div style={{ padding: 24 }}>
@@ -16,14 +17,12 @@ function Home() {
 export default function App() {
   return (
     <Routes>
-      {/* All pages that share header/sidebar/footer go inside MainLayout via Outlet */}
       <Route path="/" element={<MainLayout />}>
         <Route index element={<Home />} />
         <Route path="produtos" element={<Produtos />} />
-        {/* outras rotas que usam o mesmo layout: pedidos, clientes etc */}
+        <Route path="parceiros" element={<Parceiros />} />
+        <Route path="etapas" element={<Etapas />} />
       </Route>
-
-      {/* Rotas públicas/sem layout (login, landing) podem ficar fora */}
     </Routes>
   );
 }

@@ -1,8 +1,6 @@
 package dev.com.confectextil.dominio.principal.etapa;
 
 import dev.com.confectextil.dominio.principal.Etapa;
-
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,9 +11,14 @@ public class EtapaService {
     private final List<EtapaStrategy> estrategias;
 
     public EtapaService(EtapaRepository repository) {
-    this.repository = repository;
-    this.estrategias = List.of(); // lista vazia por padrão
-}
+        this.repository = repository;
+        this.estrategias = List.of();
+    }
+
+    public EtapaService(EtapaRepository repository, List<EtapaStrategy> estrategias) {
+        this.repository = repository;
+        this.estrategias = estrategias != null ? estrategias : List.of();
+    }
 
     public Etapa cadastrarEtapa(String etapaId, String nome, int ordem, String tipo) {
         EtapaId id = EtapaId.novo(etapaId);
@@ -24,9 +27,18 @@ public class EtapaService {
             throw new IllegalArgumentException("Etapa já cadastrada");
         }
 
-        Etapa etapa = new Etapa(id, nome, ordem);
+        // --- VALIDAÇÃO DE ORDEM ÚNICA RECOMENDADA ---
+        boolean ordemExiste = repository.listarTodos().stream()
+                .anyMatch(e -> e.getOrdem() == ordem);
 
-        // Aplica estratégia se houver e o tipo for válido
+        if (ordemExiste) {
+            throw new IllegalArgumentException("Já existe uma etapa com a ordem " + ordem + ". Escolha outra.");
+        }
+        // --------------------------------------------
+
+        // CRIA O OBJETO PASSANDO O TIPO
+        Etapa etapa = new Etapa(id, nome, ordem, tipo);
+
         if (tipo != null && !tipo.isBlank() && estrategias != null && !estrategias.isEmpty()) {
             String tipoNormalizado = tipo.trim().toUpperCase();
             estrategias.stream()
@@ -38,14 +50,10 @@ public class EtapaService {
         repository.salvar(etapa);
         return etapa;
     }
-    public Etapa cadastrarEtapa(String etapaId, String nome, int ordem) {
-    return cadastrarEtapa(etapaId, nome, ordem, null);
-}
-    public EtapaService(EtapaRepository repository, List<EtapaStrategy> estrategias) {
-        this.repository = repository;
-        this.estrategias = estrategias != null ? estrategias : List.of();
-    }
 
+    public Etapa cadastrarEtapa(String etapaId, String nome, int ordem) {
+        return cadastrarEtapa(etapaId, nome, ordem, null);
+    }
 
     public Etapa editarEtapa(String etapaId, String novoNome, Integer novaOrdem) {
         EtapaId id = EtapaId.novo(etapaId);

@@ -22,6 +22,7 @@ import dev.com.confectextil.dominio.principal.parceiro.ParceiroRepositorio;
 import dev.com.confectextil.dominio.principal.parceiro.ParceiroService;
 import dev.com.linnea.aplicacao.principal.parceiro.ParceiroRepositorioAplicacao;
 import dev.com.linnea.aplicacao.principal.parceiro.ParceiroServicoAplicacao;
+import dev.com.confectextil.dominio.principal.etapa.strategy.EtapaPadraoStrategy;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.modelmapper.ModelMapper;
@@ -52,13 +53,14 @@ public class AplicacaoBackend {
 	}
 
 	@Bean
-    public EtapaService etapaService(EtapaRepository etapaRepository) {
-        List<EtapaStrategy> estrategias = List.of(
-            new EtapaProducaoStrategy(),
-            new EtapaQualidadeStrategy()
-        );
-        return new EtapaService(etapaRepository, estrategias);
-    }
+	public EtapaService etapaService(EtapaRepository etapaRepository) {
+		List<EtapaStrategy> estrategias = List.of(
+				new EtapaProducaoStrategy(),
+				new EtapaQualidadeStrategy(),
+				new EtapaPadraoStrategy()
+		);
+		return new EtapaService(etapaRepository, estrategias);
+	}
 
 	@Bean
 	public ParceiroService parceiroService(ParceiroRepositorio repositorio, List<ObservadorNovoParceiro> observadores) {

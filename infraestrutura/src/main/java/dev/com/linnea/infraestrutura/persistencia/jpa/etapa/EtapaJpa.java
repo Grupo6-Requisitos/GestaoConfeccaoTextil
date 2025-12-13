@@ -19,6 +19,9 @@ public class EtapaJpa {
     @Column(nullable = false)
     private int ordem;
 
+    @Column(name = "tipo") // <--- COLUNA MAPEADA NO BANCO
+    private String tipo;
+
     public EtapaJpa() {}
 
     // ---------- Getters e Setters ----------
@@ -31,31 +34,33 @@ public class EtapaJpa {
     public int getOrdem() { return ordem; }
     public void setOrdem(int ordem) { this.ordem = ordem; }
 
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
+
     // ---------- Conversões ----------
 
     public static EtapaJpa fromDomain(Etapa etapa) {
         Objects.requireNonNull(etapa, "Etapa de domínio não pode ser nula");
         EtapaJpa jpa = new EtapaJpa();
-        EtapaId etapaId = etapa.getId();
-        if (etapaId != null) {
-            jpa.setId(etapaId.getValor());
+        if (etapa.getId() != null) {
+            jpa.setId(etapa.getId().getValor());
         }
         jpa.setNome(etapa.getNome());
         jpa.setOrdem(etapa.getOrdem());
+        jpa.setTipo(etapa.getTipo()); // <--- SALVA O TIPO NO BANCO
         return jpa;
     }
 
     public Etapa toDomain() {
         EtapaId etapaId = (this.id == null || this.id.isBlank()) ? null : new EtapaId(this.id);
         if (etapaId != null) {
-            return new Etapa(etapaId, this.nome, this.ordem);
+            // RECUPERA COM O TIPO
+            return new Etapa(etapaId, this.nome, this.ordem, this.tipo);
         } else {
-            // fallback: cria sem id, se necessário
-            return new Etapa(EtapaId.novo(""), this.nome, this.ordem);
+            return new Etapa(EtapaId.novo(""), this.nome, this.ordem, this.tipo);
         }
     }
 
-    // ---------- equals / hashCode ----------
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -71,6 +76,6 @@ public class EtapaJpa {
 
     @Override
     public String toString() {
-        return "EtapaJpa [id=" + id + ", nome=" + nome + ", ordem=" + ordem + "]";
+        return "EtapaJpa [id=" + id + ", nome=" + nome + ", ordem=" + ordem + ", tipo=" + tipo + "]";
     }
 }
