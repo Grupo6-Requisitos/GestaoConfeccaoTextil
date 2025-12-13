@@ -1,16 +1,12 @@
 import api from './api';
 
-const ENDPOINT = '/parceiros';
+// Backend controller is mounted at /api/parceiros
+const ENDPOINT = '/api/parceiros';
 
 export const parceiroService = {
   listar: async () => {
-    try {
-      const response = await api.get(ENDPOINT);
-      return response.data;
-    } catch (error) {
-      console.error("Erro ao listar parceiros", error);
-      return [];
-    }
+    const response = await api.get(ENDPOINT);
+    return response.data;
   },
 
   cadastrar: async (dados) => {
