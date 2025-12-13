@@ -1,4 +1,4 @@
-Padrão de Projeto Observer
+## Padrão de Projeto Observer
 
 **Implementação:**
 - O padrão Observer foi utilizado no fluxo de cadastro de Parceiros. O objetivo foi desacoplar a regra de negócio principal (salvar o parceiro no banco) de ações secundárias ou efeitos colaterais (como logs, notificações ou envios de e-mail). Assim, o ParceiroService não precisa conhecer os detalhes de quem precisa ser notificado.
@@ -16,9 +16,7 @@ Padrão de Projeto Observer
 - AplicacaoBackend:
   - Alterada para injetar a lista de observadores ao instanciar o **ParceiroService**.
 
-
-Strategy
-
+## Strategy
 
 **Contexto da Adoção:**
 O padrão Strategy foi utilizado no domínio de **Etapas**. O objetivo foi permitir que diferentes tipos de etapas (ex: Padrão, Produção, Qualidade) tenham regras de validação ou processamento distintos, sem encher o código principal de **if/else** complexos. O serviço seleciona a estratégia adequada com base no tipo da etapa.
@@ -32,7 +30,7 @@ O padrão Strategy foi utilizado no domínio de **Etapas**. O objetivo foi permi
   - Alterada para conter uma lista de EtapaStrategy.
   - No método cadastrarEtapa, foi adicionada a lógica que percorre a lista de estratégias, encontra a correta para o tipo informado e executa a regra de negócio.
 
-  Padrão Template Method
+## Padrão Template Method
 
 **Contexto da Adoção:**
 Aplicado no fluxo de salvar/editar **Fabrico**, para definir um esqueleto único de operação e permitir ganchos (validação, pós-processamento) sem duplicar lógica.
@@ -46,6 +44,10 @@ Aplicado no fluxo de salvar/editar **Fabrico**, para definir um esqueleto único
 **Classe Alterada:**
 - FabricoService: delega cadastrar/editar para os templates, preservando regras já existentes (normalização e unicidade de CNPJ, CNPJ imutável).
 
-Proxy
+## Proxy
 
 - ModeloServiceProxy (apresentação-backend): envolve ModeloService adicionando logs/auditoria ao atualizar modelos, sem alterar a lógica principal (padrão Proxy).
+
+## Iterator
+
+- Na listagem de modelos, a camada de aplicação expõe um `Iterable` (ex.: `modeloServicoConsulta.iterarTodosResumo()`), e o controlador (`ModeloControlador`) consome via `streamFromIterable`. Isso permite percorrer coleções sem acoplar à implementação concreta (padrão Iterator).
