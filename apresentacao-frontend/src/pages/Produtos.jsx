@@ -60,8 +60,8 @@ export default function Produtos() {
         const { data } = await api.get("/modelos");
         if (!active) return;
 
-        const normalized = (data || []).map((modelo, idx) =>
-          normalizeModelo(modelo, idx, false) // força buscar detalhes no flip
+        const normalized = (data || []).map(
+          (modelo, idx) => normalizeModelo(modelo, idx, false) // força buscar detalhes no flip
         );
 
         setProducts(normalized);
@@ -83,58 +83,6 @@ export default function Produtos() {
       active = false;
     };
   }, []);
-
-  const handleFlip = async (product) => {
-    const nextFlipped = flippedId === product.id ? null : product.id;
-    setFlippedId(nextFlipped);
-    setEditingId(null);
-
-    const needsDetails = !product.insumosLoaded && product.reference;
-    if (nextFlipped && needsDetails) {
-      await fetchDetails(product);
-    }
-  };
-
-  const handleEdit = async (product) => {
-    setFlippedId(product.id);
-    setEditingId(product.id);
-    setForm({
-      name: product.name || "",
-      reference: product.reference || "",
-    });
-    if (!product.insumosLoaded && product.reference) {
-      await fetchDetails(product);
-    }
-  };
-
-  const handleSave = async (evt) => {
-    evt.preventDefault();
-    const target = products.find((p) => p.id === editingId);
-    if (!target) return;
-    setSaving(true);
-    try {
-      const payload = {
-        referencia: form.reference,
-        nome: form.name,
-        imagemUrl: target.imagemUrl || target.image || null,
-        insumosPadrao: target.insumosPadrao || [],
-        };
-
-      const { data } = await api.put(`/modelos/${target.reference}`, payload);
-
-      const updated = normalizeModelo(data || payload);
-      setProducts((prev) =>
-        prev.map((p) => (p.id === target.id ? updated : p))
-      );
-      setEditingId(null);
-      setModalProduct(updated);
-    } catch (err) {
-      console.error("Erro ao salvar modelo", err);
-      setError("Não foi possível salvar o modelo.");
-    } finally {
-      setSaving(false);
-    }
-  };
 
   const fetchDetails = async (product) => {
     if (!product.reference) return;
@@ -177,29 +125,39 @@ export default function Produtos() {
     }
   };
 
-  const handleViewDetails = async (product) => {
-    setModalOpen(true);
-    setModalMode("view");
-    setModalLoading(true);
-    setModalProduct(product);
+  const handleSave = async (evt) => {
+    evt && evt.preventDefault && evt.preventDefault();
+    const target = products.find((p) => p.id === editingId);
+    if (!target) return;
+    setSaving(true);
     try {
-      const updated = await fetchDetails(product);
-      if (updated) {
-        setModalProduct(updated);
-      }
+      const payload = {
+        referencia: form.reference,
+        nome: form.name,
+        imagemUrl: target.imagemUrl || target.image || null,
+        insumosPadrao: target.insumosPadrao || [],
+      };
+
+      const { data } = await api.put(`/modelos/${target.reference}`, payload);
+
+      const updated = normalizeModelo(data || payload);
+      setProducts((prev) =>
+        prev.map((p) => (p.id === target.id ? updated : p))
+      );
+      setEditingId(null);
+      setModalProduct(updated);
+      setModalMode("view");
+    } catch (err) {
+      console.error("Erro ao salvar modelo", err);
+      setError("Não foi possível salvar o modelo.");
     } finally {
-      setModalLoading(false);
+      setSaving(false);
     }
   };
 
-  const handleEditModal = async (product) => {
+  const handleOpenModal = async (product) => {
     setModalOpen(true);
-    setModalMode("edit");
-    setEditingId(product.id);
-    setForm({
-      name: product.name || "",
-      reference: product.reference || "",
-    });
+    setModalMode("view");
     setModalLoading(true);
     setModalProduct(product);
     try {
@@ -262,7 +220,7 @@ export default function Produtos() {
               className="search-box__icon"
               aria-label="Buscar"
               onClick={() => {
-                /* adicionar comportamento de busca */
+                /* comportamento de busca caso queira */
               }}
             >
               <svg
@@ -300,9 +258,7 @@ export default function Produtos() {
       </div>
 
       <div className="grid-products">
-        {loading && (
-          <div className="grid-feedback">Carregando modelos...</div>
-        )}
+        {loading && <div className="grid-feedback">Carregando modelos...</div>}
         {error && !loading && (
           <div className="grid-feedback error">{error}</div>
         )}
@@ -315,18 +271,13 @@ export default function Produtos() {
             <ProductCard
               key={p.id}
               product={p}
-              isFlipped={false}
-              isEditing={false}
-              form={{ name: p.name, reference: p.reference }}
-              onFlip={() => handleViewDetails(p)}
-              onEdit={() => handleEditModal(p)}
-              onCancelEdit={() => setEditingId(null)}
-              onChangeForm={setForm}
-              onSave={handleSave}
+              onFlip={() => handleOpenModal(p)} // open modal when card clicked
+              onEdit={() => {
+                /* unused: editing occurs inside modal now */
+              }}
               saving={saving}
-              onDelete={handleDelete}
+              onDelete={() => handleDelete(p)}
               deleting={deletingId === p.id}
-              loadingDetails={detailLoadingId === p.id}
             />
           ))}
       </div>
@@ -339,10 +290,19 @@ export default function Produtos() {
             aria-modal="true"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="modal-header">
+            <div
+              className="modal-header"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <div>
                 <div className="modal-title">
-                  {modalMode === "edit" ? "Editar modelo" : "Detalhes do modelo"}
+                  {modalMode === "edit"
+                    ? "Editar modelo"
+                    : "Detalhes do modelo"}
                 </div>
                 <div className="modal-sub">
                   {modalProduct?.reference
@@ -350,16 +310,89 @@ export default function Produtos() {
                     : "Sem referência"}
                 </div>
               </div>
-              <button className="card-btn" onClick={closeModal}>
-                Fechar
-              </button>
+
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                {/* Edit icon: toggles edit mode and initializes form */}
+                <button
+                  type="button"
+                  title={modalMode === "edit" ? "Cancelar edição" : "Editar"}
+                  className="icon-btn"
+                  onClick={() => {
+                    if (!modalProduct) return;
+                    if (modalMode !== "edit") {
+                      setModalMode("edit");
+                      setEditingId(modalProduct.id);
+                      setForm({
+                        name: modalProduct.name || "",
+                        reference: modalProduct.reference || "",
+                      });
+                    } else {
+                      setModalMode("view");
+                      setEditingId(null);
+                    }
+                  }}
+                >
+                  {/* pencil icon */}
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden
+                  >
+                    <path
+                      d="M3 21l3-1 11-11 2-3-3 2L8 19l-1 3z"
+                      stroke="currentColor"
+                      strokeWidth="1.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+
+                {/* Delete icon: confirms and deletes */}
+                <button
+                  type="button"
+                  title="Excluir"
+                  className="icon-btn danger"
+                  onClick={() => {
+                    if (!modalProduct) return;
+                    const ok = window.confirm(
+                      `Deseja realmente excluir o modelo ${modalProduct.name}?`
+                    );
+                    if (!ok) return;
+                    handleDelete(modalProduct);
+                  }}
+                >
+                  {/* trash icon */}
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden
+                  >
+                    <path
+                      d="M3 6h18M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6M10 6V4a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v2"
+                      stroke="currentColor"
+                      strokeWidth="1.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+
+                <button className="card-btn" onClick={closeModal}>
+                  Fechar
+                </button>
+              </div>
             </div>
 
             {modalLoading && (
               <div className="details-empty">Carregando detalhes...</div>
             )}
 
-            {!modalLoading && modalMode === "view" && modalProduct && (
+            {!modalLoading && modalProduct && modalMode === "view" && (
               <div className="modal-body">
                 <div className="modal-field">
                   <span className="label">Nome</span>
@@ -456,7 +489,10 @@ export default function Produtos() {
                   <button
                     type="button"
                     className="card-btn"
-                    onClick={closeModal}
+                    onClick={() => {
+                      setModalMode("view");
+                      setEditingId(null);
+                    }}
                     disabled={saving}
                   >
                     Cancelar

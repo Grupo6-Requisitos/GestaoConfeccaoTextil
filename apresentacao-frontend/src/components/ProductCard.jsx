@@ -1,71 +1,5 @@
-// import React from "react";
-
-// function formatDate(d) {
-//   const dd = String(d.getDate()).padStart(2, "0");
-//   const mm = String(d.getMonth() + 1).padStart(2, "0");
-//   const yyyy = d.getFullYear();
-//   return `${dd}/${mm}/${yyyy}`;
-// }
-
-// // ProductCard expects product { id, name, type, createdAt: Date, image }
-// export default function ProductCard({ product }) {
-//   return (
-//     <article
-//       className="product-card"
-//       role="article"
-//       aria-labelledby={`product-${product.id}`}
-//     >
-//       <div
-//         className="card-media"
-//         style={{
-//           /*
-//             Gradient changed per request:
-//             - no overlay at the top (transparent)
-//             - subtle blue near the bottom (use low alpha for subtlety)
-//             - the URL image sits below the gradient layer
-//           */
-//           backgroundImage: `linear-gradient(to bottom, rgba(169,226,242,0) 60%, rgba(169,226,242,0.14) 100%), url(${product.image})`,
-//         }}
-//       >
-//         {/* name aligned left, bigger and moved a bit lower */}
-//         <div className="card-name" id={`product-${product.id}`}>
-//           <svg
-//             width="16"
-//             height="16"
-//             viewBox="0 0 24 24"
-//             fill="none"
-//             aria-hidden
-//           >
-//             <path
-//               d="M3 7v13h13V7"
-//               stroke="currentColor"
-//               strokeWidth="1.2"
-//               strokeLinecap="round"
-//               strokeLinejoin="round"
-//             />
-//             <path
-//               d="M7 3h8v4H7z"
-//               stroke="currentColor"
-//               strokeWidth="1.2"
-//               strokeLinecap="round"
-//               strokeLinejoin="round"
-//             />
-//           </svg>
-//           <span className="card-name__text">{product.name}</span>
-//         </div>
-//       </div>
-
-//       {/* bottom area: pure gray background (no gradient) - colors controlled via CSS variables */}
-//       <div className="card-meta">
-//         <div className="type">{product.type}</div>
-//         <div className="created">Criado em {formatDate(product.createdAt)}</div>
-//       </div>
-//     </article>
-//   );
-// }
-
 import React from "react";
-import tagIcon from "../assets/tag.svg"; // <- novo: coloque src/assets/tag.svg no projeto
+import tagIcon from "../assets/tag.svg"; // <- certifique-se que src/assets/tag.svg existe
 
 function formatDate(value) {
   if (!value) return "sem data";
@@ -100,29 +34,46 @@ export default function ProductCard({
         className="product-card"
         role="article"
         aria-labelledby={`product-${product.id}`}
-        onClick={() => onFlip?.(product)}
+        onClick={() => onFlip?.(product)} // clicking anywhere on the card opens modal
+        style={{ cursor: "pointer" }}
       >
         <div className="card-face card-front">
           <div
             className="card-media"
             style={{
-              backgroundImage: `linear-gradient(to bottom, rgba(169,226,242,0) 60%, rgba(169,226,242,0.75) 100%), url(${product.image})`,
+              /*
+                Degradê sutil restaurado (igual ao anterior):
+                - começa transparente e no 60% aparece o azul com alpha 0.14
+                - aumente o alpha ou reduza 60% para deixar azul mais forte / mais acima
+              */
+              backgroundImage: `linear-gradient(to bottom, rgba(169,226,242,0) 60%, rgba(169,226,242,0.14) 100%), url(${product.image})`,
             }}
+            aria-hidden
           >
-            <div className="card-name" id={`product-${product.id}`}>
+            {/* Title + icon moved to bottom-left (no background) */}
+            <div
+              className="card-name"
+              id={`product-${product.id}`}
+              style={{
+                left: 16,
+                bottom: 64,
+                position: "absolute",
+              }}
+            >
               <img
                 src={tagIcon}
                 alt="etiqueta"
                 className="card-name__icon"
                 width="16"
                 height="16"
+                style={{ display: "inline-block" }}
               />
               <span className="card-name__text">{product.name}</span>
             </div>
-            <div className="card-ref">
-              {product.name || product.reference || "Sem nome"}
-            </div>
+
+            {/* Note: removed the 'Ver detalhes' button and any other card-level action buttons */}
           </div>
+
           <div className="card-meta">
             <div className="type">{product.type || "Modelo"}</div>
             <div className="created">
@@ -131,37 +82,8 @@ export default function ProductCard({
                   ? `Criado em ${formatDate(product.createdAt)}`
                   : "Detalhes não informados")}
             </div>
-            <div
-              className="card-front-actions"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                type="button"
-                className="card-btn"
-                onClick={() => onFlip?.(product)}
-              >
-                Ver detalhes
-              </button>
-              <button
-                type="button"
-                className="card-btn primary"
-                onClick={() => onEdit?.(product)}
-                disabled={saving || deleting}
-              >
-                Editar
-              </button>
-              <button
-                type="button"
-                className="card-btn danger"
-                onClick={() => onDelete?.(product)}
-                disabled={deleting}
-              >
-                {deleting ? "Excluindo..." : "Excluir"}
-              </button>
-            </div>
-            </div>
           </div>
-
+        </div>
       </article>
     </div>
   );

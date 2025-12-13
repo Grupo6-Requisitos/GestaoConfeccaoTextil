@@ -11,4 +11,8 @@ public record ModeloId(String valor) {
     public ModeloId() {
         this(java.util.UUID.randomUUID().toString());
     }
+
+    public String getValor() {
+        return valor;
+    }
 }
