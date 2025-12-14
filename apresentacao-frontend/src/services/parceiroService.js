@@ -14,6 +14,11 @@ export const parceiroService = {
     return response.data;
   },
 
+  editar: async (id, dados) => {
+    const response = await api.put(`${ENDPOINT}/${id}`, dados);
+    return response.data;
+  },
+
   excluir: async (id) => {
     await api.delete(`${ENDPOINT}/${id}`);
   }

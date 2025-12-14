@@ -9,6 +9,7 @@ export default function Parceiros() {
   const [parceiros, setParceiros] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [editingParceiro, setEditingParceiro] = useState(null);
   const [formData, setFormData] = useState({ id: "", nome: "", telefone: "" });
   const [notificacao, setNotificacao] = useState(null);
 
@@ -28,17 +29,6 @@ export default function Parceiros() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (confirm("Deseja realmente excluir este parceiro?")) {
-      try {
-        await parceiroService.excluir(id);
-        setParceiros((prev) => prev.filter((p) => p.id !== id));
-      } catch (error) {
-        alert("Erro ao excluir parceiro.");
-      }
-    }
-  };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -46,22 +36,35 @@ export default function Parceiros() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    const isEditando = Boolean(editingParceiro);
     const payload = {
       id: (formData.id || "").trim(),
       nome: (formData.nome || "").trim(),
       telefone: (formData.telefone || "").trim(),
     };
 
-    if (!payload.id || !payload.nome || !payload.telefone) {
+    if ((!isEditando && !payload.id) || !payload.nome || !payload.telefone) {
       alert("Todos os campos são obrigatórios!");
       return;
     }
     try {
-      const novoParceiro = await parceiroService.cadastrar(payload);
-      setParceiros((prev) => [...prev, novoParceiro]);
+      let parceiroSalvo;
+      if (isEditando) {
+        parceiroSalvo = await parceiroService.editar(editingParceiro.id, {
+          ...payload,
+          id: editingParceiro.id,
+        });
+        setParceiros((prev) =>
+          prev.map((p) => (p.id === editingParceiro.id ? parceiroSalvo : p))
+        );
+      } else {
+        parceiroSalvo = await parceiroService.cadastrar(payload);
+        setParceiros((prev) => [...prev, parceiroSalvo]);
+      }
       setShowModal(false);
       setFormData({ id: "", nome: "", telefone: "" });
-      mostrarNotificacao(novoParceiro);
+      setEditingParceiro(null);
+      mostrarNotificacao(parceiroSalvo, isEditando);
     } catch (error) {
       const msg =
         error?.response?.data?.mensagem ||
@@ -72,12 +75,34 @@ export default function Parceiros() {
     }
   };
 
-  const mostrarNotificacao = (parceiro) => {
+  const mostrarNotificacao = (parceiro, isEdicao) => {
     setNotificacao({
-      titulo: "Salvo com Sucesso!",
+      titulo: isEdicao ? "Parceiro atualizado!" : "Salvo com Sucesso!",
       detalhes: `ID: ${parceiro.id} | Nome: ${parceiro.nome}`
     });
     setTimeout(() => setNotificacao(null), 4000);
+  };
+
+  const abrirModalNovo = () => {
+    setEditingParceiro(null);
+    setFormData({ id: "", nome: "", telefone: "" });
+    setShowModal(true);
+  };
+
+  const fecharModal = () => {
+    setShowModal(false);
+    setEditingParceiro(null);
+    setFormData({ id: "", nome: "", telefone: "" });
+  };
+
+  const abrirModalEdicao = (parceiro) => {
+    setEditingParceiro(parceiro);
+    setFormData({
+      id: parceiro.id || "",
+      nome: parceiro.nome || "",
+      telefone: parceiro.telefone || "",
+    });
+    setShowModal(true);
   };
 
   return (
@@ -107,7 +132,7 @@ export default function Parceiros() {
         </div>
 
         <div className="controls">
-          <button className="btn-pill" onClick={() => setShowModal(true)}>
+          <button className="btn-pill" onClick={abrirModalNovo}>
             Adicionar parceiros +
           </button>
         </div>
@@ -135,12 +160,15 @@ export default function Parceiros() {
                   <div className="info-value">{parceiro.telefone}</div>
                 </div>
               </div>
-              <button className="btn-trash" onClick={() => handleDelete(parceiro.id)}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="3 6 5 6 21 6"></polyline>
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                </svg>
-              </button>
+              <div className="card-actions">
+                <button
+                  className="btn-edit"
+                  type="button"
+                  onClick={() => abrirModalEdicao(parceiro)}
+                >
+                  Editar
+                </button>
+              </div>
             </div>
           ))
         )}
@@ -149,11 +177,19 @@ export default function Parceiros() {
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <h2>Novo Parceiro</h2>
+            <h2>{editingParceiro ? "Editar Parceiro" : "Novo Parceiro"}</h2>
             <form onSubmit={handleSave}>
               <div className="form-group">
                 <label>ID *</label>
-                <input className="form-input" name="id" value={formData.id} onChange={handleInputChange} placeholder="Digite o ID" required />
+                <input
+                  className="form-input"
+                  name="id"
+                  value={formData.id}
+                  onChange={handleInputChange}
+                  placeholder="Digite o ID"
+                  required={!editingParceiro}
+                  disabled={Boolean(editingParceiro)}
+                />
               </div>
               <div className="form-group">
                 <label>Nome *</label>
@@ -164,7 +200,7 @@ export default function Parceiros() {
                 <input className="form-input" name="telefone" value={formData.telefone} onChange={handleInputChange} placeholder="Ex: 81999998888" required />
               </div>
               <div className="modal-actions">
-                <button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>Cancelar</button>
+                <button type="button" className="btn-cancel" onClick={fecharModal}>Cancelar</button>
                 <button type="submit" className="btn-save">Salvar</button>
               </div>
             </form>
