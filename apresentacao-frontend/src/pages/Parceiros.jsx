@@ -46,18 +46,29 @@ export default function Parceiros() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!formData.id || !formData.nome || !formData.telefone) {
+    const payload = {
+      id: (formData.id || "").trim(),
+      nome: (formData.nome || "").trim(),
+      telefone: (formData.telefone || "").trim(),
+    };
+
+    if (!payload.id || !payload.nome || !payload.telefone) {
       alert("Todos os campos são obrigatórios!");
       return;
     }
     try {
-      const novoParceiro = await parceiroService.cadastrar(formData);
+      const novoParceiro = await parceiroService.cadastrar(payload);
       setParceiros((prev) => [...prev, novoParceiro]);
       setShowModal(false);
       setFormData({ id: "", nome: "", telefone: "" });
       mostrarNotificacao(novoParceiro);
     } catch (error) {
-      alert("Erro ao salvar. Verifique se o ID já existe.");
+      const msg =
+        error?.response?.data?.mensagem ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Erro ao salvar parceiro.";
+      alert(msg);
     }
   };
 

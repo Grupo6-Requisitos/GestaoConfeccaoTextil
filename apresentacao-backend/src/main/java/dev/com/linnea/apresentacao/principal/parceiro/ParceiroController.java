@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/api/parceiros")
+@RequestMapping({"/api/parceiros", "/parceiros"})
 public class ParceiroController {
     private final ParceiroService parceiroService;
     private final ParceiroServicoAplicacao parceiroAppService;
